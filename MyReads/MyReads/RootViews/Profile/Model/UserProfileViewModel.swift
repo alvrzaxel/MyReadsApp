@@ -10,14 +10,7 @@ import FirebaseAuth
 
 @MainActor
 final class UserProfileViewModel: ObservableObject {
-    @Published var user: User? {
-        didSet {
-            // Cargar datos cuando se establece el usuario
-            Task {
-                await loadCurrentUser()
-            }
-        }
-    }
+    @Published var user: User?
     @Published var errorMessage: String?
     @Published var showAlert: Bool = false
     @Published var wantToReadBooks: [Book] = []
@@ -25,167 +18,100 @@ final class UserProfileViewModel: ObservableObject {
     @Published var currentlyReadingBooks: [Book] = []
     
     private let userProfileRepository: UserProfileRepository
-    private let googleApiViewModel = GoogleApiViewModel()
     
-    // Nuevo inicializador que recibe un usuario opcional
-    init(repository: UserProfileRepository = UserProfileRepository()) {
-        self.userProfileRepository = repository
+    private let googleApiViewRepository: GoogleApiRepository
+    
+    init(
+        userProfileRepository: UserProfileRepository = UserProfileRepository(),
+        googleApiViewRepository: GoogleApiRepository = GoogleApiRepository()
+    ) {
+        self.userProfileRepository = userProfileRepository
+        self.googleApiViewRepository = googleApiViewRepository
     }
     
-    func initialize() async {
-        await loadCurrentUser()
-    }
-    
-    func loadCurrentUser() async {
-        guard let currentUser = user else {
-            errorMessage = "No user is logged in"
-            return
-        }
-        
-        do {
-            if let fetchedUser = try await userProfileRepository.getBSUser(userId: currentUser.uid) {
-                self.user = fetchedUser
-                await fetchBooks()
-            } else {
-                await createBDUser(auth: User(uid: currentUser.uid, email: currentUser.email, photoURL: currentUser.photoURL))
+    // Carga el usuario y actualiza la vista
+    func getCurrentUser() async {
+        Task {
+            do {
+                guard let currentUser = user else { return }
+                
+                // Si el usuario tiene documento en la base de datos, lo volcamos en user
+                if let userFromBD = try await userProfileRepository.getBSUser(authUser: currentUser) {
+                    self.user = userFromBD
+                } else {
+                    
+                    // Si el usuario no tiene documento, le creamos la base de datos y lo volcamos en user
+                    try await userProfileRepository.createBDUser(authUser: currentUser)
+                    let newUserFromBD = try await userProfileRepository.getBSUser(authUser: currentUser)
+                    self.user = newUserFromBD
+                }
+                
+            } catch {
+                self.errorMessage = error.localizedDescription
+                self.showAlert = true
             }
-        } catch {
-            errorMessage = error.localizedDescription
         }
     }
     
-    func createBDUser(auth: User) async {
-        do {
-            try await userProfileRepository.createBDUser(auth: auth)
-            self.user = auth
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    func updateUser(auth: User) async {
-        do {
-            try await userProfileRepository.updateUser(auth: auth)
-            self.user = auth
-            await fetchBooks()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-    
-    func refreshUserData() async {
-        guard let currentUser = user else {
-            errorMessage = "No user is logged in"
-            return
-        }
-        
-        do {
-            if let updatedUser = try await userProfileRepository.getBSUser(userId: currentUser.uid) {
-                self.user = updatedUser
-                await fetchBooks()
-            } else {
-                errorMessage = "Failed to fetch user data"
-                showAlert = true
+    // Añade un libro a una lista específica
+    func addBook(book: Book, to listType: BookListType) {
+        Task {
+            do {
+                guard var currentUser = user else { return }
+                var updateBooks = getBooks(for: listType, from: currentUser)
+                updateBooks.append(book.id)
+                
+                try await userProfileRepository.updateBookList(authUser: currentUser, books: updateBooks, listType: listType)
+                updateLocalUserBookList(updateBooks, for: listType, in: &currentUser)
+                self.user = currentUser
+                
+            } catch {
+                self.errorMessage = error.localizedDescription
+                self.showAlert = true
             }
-        } catch {
-            errorMessage = error.localizedDescription
-            showAlert = true
         }
     }
     
-    // Métodos para añadir y remover libros
-    func addBookToWantToRead(bookId: String) async {
-        guard var user = user else { return }
-        user.wantToRead.append(bookId)
-        await updateUser(auth: user)
-        await fetchWantToReadBooks()
-    }
-    
-    func removeBookFromWantToRead(bookId: String) async {
-        guard var user = user else { return }
-        user.wantToRead.removeAll { $0 == bookId }
-        await updateUser(auth: user)
-        await fetchWantToReadBooks()
-    }
-    
-    func addBookToRead(bookId: String) async {
-        guard var user = user else { return }
-        user.read.append(bookId)
-        await updateUser(auth: user)
-        await fetchReadBooks()
-    }
-    
-    func removeBookFromRead(bookId: String) async {
-        guard var user = user else { return }
-        user.read.removeAll { $0 == bookId }
-        await updateUser(auth: user)
-        await fetchReadBooks()
-    }
-    
-    func addBookToCurrentlyReading(bookId: String) async {
-        guard var user = user else { return }
-        user.currentlyReading.append(bookId)
-        await updateUser(auth: user)
-        await fetchCurrentlyReadingBooks()
-    }
-    
-    func removeBookFromCurrentlyReading(bookId: String) async {
-        guard var user = user else { return }
-        user.currentlyReading.removeAll { $0 == bookId }
-        await updateUser(auth: user)
-        await fetchCurrentlyReadingBooks()
-    }
-    
-    // Métodos para obtener listas de libros
-    func getWantToReadBooks() async -> [Book] {
-        await fetchWantToReadBooks()
-        return wantToReadBooks
-    }
-    
-    func getReadBooks() async -> [Book] {
-        await fetchReadBooks()
-        return readBooks
-    }
-    
-    func getCurrentlyReadingBooks() async -> [Book] {
-        await fetchCurrentlyReadingBooks()
-        return currentlyReadingBooks
-    }
-    
-    // Métodos para buscar libros por sus IDs
-    func fetchWantToReadBooks() async {
-        guard let user = user else { return }
-        do {
-            let books = try await googleApiViewModel.fetchBooksByIds(ids: user.wantToRead)
-            self.wantToReadBooks = books
-        } catch {
-            errorMessage = error.localizedDescription
+    // Elimina un libro de una lista específica
+    func removeBook(book: Book, from listType: BookListType) {
+        Task {
+            do {
+                guard var currentUser = user else { return }
+                var updateBooks = getBooks(for: listType, from: currentUser)
+                updateBooks.removeAll { $0 == book.id }
+                
+                try await userProfileRepository.updateBookList(authUser: currentUser, books: updateBooks, listType: listType)
+                updateLocalUserBookList(updateBooks, for: listType, in: &currentUser)
+                self.user = currentUser
+                
+            } catch {
+                self.errorMessage = error.localizedDescription
+                self.showAlert = true
+            }
         }
     }
     
-    func fetchReadBooks() async {
-        guard let user = user else { return }
-        do {
-            let books = try await googleApiViewModel.fetchBooksByIds(ids: user.read)
-            self.readBooks = books
-        } catch {
-            errorMessage = error.localizedDescription
+    // Obtiene la lista de libros actual para un tipo de lista dado
+    private func getBooks(for listType: BookListType, from user: User) -> [String] {
+        switch listType {
+        case .wantToRead:
+            return user.wantToRead
+        case .read:
+            return user.read
+        case .currentlyReading:
+            return user.currentlyReading
         }
     }
     
-    func fetchCurrentlyReadingBooks() async {
-        guard let user = user else { return }
-        do {
-            let books = try await googleApiViewModel.fetchBooksByIds(ids: user.currentlyReading)
-            self.currentlyReadingBooks = books
-        } catch {
-            errorMessage = error.localizedDescription
+    // Actualiza el estado local del usuario con la lista de libros modificada
+    private func updateLocalUserBookList(_ books: [String], for listType: BookListType, in user: inout User) {
+        switch listType {
+        case .wantToRead:
+            user.wantToRead = books
+        case .read:
+            user.read = books
+        case .currentlyReading:
+            user.currentlyReading = books
         }
-    }
-    
-    func fetchBooks() async {
-        await fetchWantToReadBooks()
-        await fetchReadBooks()
-        await fetchCurrentlyReadingBooks()
     }
 }

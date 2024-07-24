@@ -15,7 +15,9 @@ class GoogleApiDatasoruce {
     
     // Búsqueda genérica de libro
     func fetchBooks(query: String) async throws -> [Book] {
-        let urlString = "\(baseURL)?q=\(query)&key=\(apiKey)"
+        // Escapamos el query para evistar probelmas con caracteres especiales
+        let escapedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "\(baseURL)?q=\(escapedQuery)&key=\(apiKey)"
         print(urlString)
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -30,7 +32,44 @@ class GoogleApiDatasoruce {
         return booksResponse.items
     }
     
-    // Búsqueda por id
+    // Búsqueda por categoría
+    func fetchBooks(byCategory category: String) async throws -> [Book] {
+        let escapedCategory = category.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "\(baseURL)?q=subject:\(escapedCategory)&key=\(apiKey)"
+        
+        guard let url = URL(string: urlString) else {
+            throw URLError(.badURL)
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let booksResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
+        return booksResponse.items
+    }
+    
+    // Búsqueda por autor
+    func fetchBooks(byAuthor author: String) async throws -> [Book] {
+        let escapedAuthor = author.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "\(baseURL)?q=inauthor:\(escapedAuthor)&key=\(apiKey)"
+        
+        guard let url = URL(string: urlString) else {
+            throw URLError(.badURL)
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let booksResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
+        return booksResponse.items
+    }
+    
+    
+    // Búsqueda por id de libro
     func fetchBook(byId id: String) async throws -> Book? {
         let urlString = "\(baseURL)/\(id)?key=\(apiKey)"
         guard let url = URL(string: urlString) else {
@@ -46,42 +85,32 @@ class GoogleApiDatasoruce {
         return bookResponse
     }
     
-    // Búsqueda por categoría
-    func fetchBooks(byCategory category: String) async throws -> [Book] {
-        let urlString = "\(baseURL)?q=subject:\(category)&key=\(apiKey)"
-        
-        guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
-        }
-        
-        let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw URLError(.badServerResponse)
-        }
-        
-        let booksResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
-        return booksResponse.items
-    }
-    
-    // Búsqueda por múltiples IDs
-    func fetchBooksByIds(ids: [String]) async throws -> [Book] {
-        var books: [Book] = []
-        // Realiza las solicitudes en paralelo
-        try await withThrowingTaskGroup(of: (String, Book?).self) { group in
-            for id in ids {
-                group.addTask {
-                    (id, try await self.fetchBook(byId: id))
-                }
-            }
-            
-            for try await (id, book) in group {
-                if let book = book {
-                    books.append(book)
-                } else {
-                    print("Book with ID \(id) not found.")
-                }
-            }
-        }
-        return books
-    }
 }
+    
+    
+    
+    
+    
+    
+//    // Búsqueda por múltiples IDs
+//    func fetchBooksByIds(ids: [String]) async throws -> [Book] {
+//        var books: [Book] = []
+//        // Realiza las solicitudes en paralelo
+//        try await withThrowingTaskGroup(of: (String, Book?).self) { group in
+//            for id in ids {
+//                group.addTask {
+//                    (id, try await self.fetchBook(byId: id))
+//                }
+//            }
+//            
+//            for try await (id, book) in group {
+//                if let book = book {
+//                    books.append(book)
+//                } else {
+//                    print("Book with ID \(id) not found.")
+//                }
+//            }
+//        }
+//        return books
+//    }
+

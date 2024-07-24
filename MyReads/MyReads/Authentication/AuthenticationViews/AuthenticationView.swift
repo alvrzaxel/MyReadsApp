@@ -57,6 +57,11 @@ struct AuthenticationView: View {
         .padding(.horizontal, 40)
         .frame(maxWidth: .infinity)
         
+//        .alert(isPresented: $authenticationViewModel.showAlert) {
+//                    Alert(title: Text("Error"), message: Text(authenticationViewModel.messageError ?? "Unknown error"), dismissButton: .default(Text("OK"), action: {
+//                        authenticationViewModel.cleanErrorMessage()
+//                    }))
+        
         
     }
 }

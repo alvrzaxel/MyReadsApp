@@ -8,30 +8,30 @@
 import Foundation
 
 class GoogleApiRepository {
-    private let googleApiData: GoogleApiData
+    private let googleApiDatasoruce: GoogleApiDatasoruce
     
-    init(googleApiData: GoogleApiData = GoogleApiData()) {
-        self.googleApiData = googleApiData
+    init(googleApiData: GoogleApiDatasoruce = GoogleApiDatasoruce()) {
+        self.googleApiDatasoruce = googleApiData
     }
     
-    // Método para obtener libros basados en la consulta de búsqueda
-    func fetchBooks(query: String) async throws -> [Book] {
-        return try await googleApiData.fetchBooks(query: query)
+    // Busca libros usando una consulta genérica
+    func searchBooks(query: String) async throws -> [Book] {
+        return try await googleApiDatasoruce.fetchBooks(query: query)
     }
     
-    // Método para obtener un libro por ID
-    func fetchBook(byId id: String) async throws -> Book? {
-        return try await googleApiData.fetchBook(byId: id)
+    // Busca libros por su cateogria
+    func searchBooks(byCategory category: String) async throws -> [Book] {
+        return try await googleApiDatasoruce.fetchBooks(byCategory: category)
     }
     
-    // Método para obtener libros por categoría
-    func fetchBooks(byCategory category: String) async throws -> [Book] {
-        return try await googleApiData.fetchBooks(byCategory: category)
+    // Busca libros por su autor
+    func searchBooks(byAuthor author: String) async throws -> [Book] {
+        try await googleApiDatasoruce.fetchBooks(byAuthor: author)
     }
     
-    // Método para obtener libros por múltiples IDs
-    func fetchBooksByIds(ids: [String]) async throws -> [Book] {
-        return try await googleApiData.fetchBooksByIds(ids: ids)
+    // Busca un libro por su ID
+    func getBook(byID id: String) async throws -> Book? {
+        try await googleApiDatasoruce.fetchBook(byId: id)
     }
 }
 
