@@ -1,0 +1,22 @@
+{
+  "images" : [
+    {
+      "filename" : "MyReadsImageAuthenticationNegro.png",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "MyReadsImageAuthenticationBlanco.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
