@@ -49,11 +49,7 @@ struct UserProfileView: View {
                 UserSettingsView(authenticationViewModel: authenticationViewModel)
                 
             })
-//            .onAppear {
-//                Task {
-//                    await userProfileViewModel.loadCurrentUser()
-//                }
-//            }
+
         }
     }
 }

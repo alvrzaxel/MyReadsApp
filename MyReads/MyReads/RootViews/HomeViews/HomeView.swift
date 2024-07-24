@@ -18,6 +18,11 @@ struct HomeView: View {
     
     var body: some View {
         VStack {
+            
+            Text(authenticationViewModel.user?.email ?? "noemail")
+            Text(userProfileViewModel.user?.email ?? "noemail")
+            Text(userProfileViewModel.user?.photoURL ?? "nophoto")
+            
             if isVisible {
                 SearchResultsView(authenticationViewModel: authenticationViewModel, googleApiViewModel: googleApiViewModel, userProfileViewModel: userProfileViewModel, isVisible: $isVisible)
                 
@@ -45,6 +50,11 @@ struct HomeView: View {
             .background(.generalBackground.opacity(0.98))
             
         }
+//        .onAppear {
+//                userProfileViewModel.loadCurrentUser()
+//        }
+        
+        
     }
 }
 

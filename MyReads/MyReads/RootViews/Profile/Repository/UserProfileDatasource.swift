@@ -44,7 +44,6 @@ final class UserProfileDatasource {
     func getBSUser(userID: String) async throws -> User? {
         let doc = try await Firestore.firestore().collection("users").document(userID).getDocument()
         guard let data = doc.data() else { return nil }
-        
         return User(
             uid: data["user_id"] as? String ?? "",
             email: data["email"] as? String,

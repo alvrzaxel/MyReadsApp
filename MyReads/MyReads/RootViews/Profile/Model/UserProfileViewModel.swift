@@ -18,40 +18,57 @@ final class UserProfileViewModel: ObservableObject {
     @Published var currentlyReadingBooks: [Book] = []
     
     private let userProfileRepository: UserProfileRepository
-    
+    private let authenticationRepository: AuthenticationRepository
     private let googleApiViewRepository: GoogleApiRepository
     
     init(
         userProfileRepository: UserProfileRepository = UserProfileRepository(),
+        authenticationRepository: AuthenticationRepository = AuthenticationRepository(),
         googleApiViewRepository: GoogleApiRepository = GoogleApiRepository()
     ) {
         self.userProfileRepository = userProfileRepository
+        self.authenticationRepository = authenticationRepository
         self.googleApiViewRepository = googleApiViewRepository
+        
     }
     
-    // Carga el usuario y actualiza la vista
-    func getCurrentUser() async {
+    
+    // Carga la información del usuario actual
+    func loadCurrentUser() {
         Task {
-            do {
-                guard let currentUser = user else { return }
-                
-                // Si el usuario tiene documento en la base de datos, lo volcamos en user
-                if let userFromBD = try await userProfileRepository.getBSUser(authUser: currentUser) {
-                    self.user = userFromBD
-                } else {
-                    
-                    // Si el usuario no tiene documento, le creamos la base de datos y lo volcamos en user
-                    try await userProfileRepository.createBDUser(authUser: currentUser)
-                    let newUserFromBD = try await userProfileRepository.getBSUser(authUser: currentUser)
-                    self.user = newUserFromBD
-                }
-                
-            } catch {
-                self.errorMessage = error.localizedDescription
-                self.showAlert = true
+            guard let currentUser = authenticationRepository.getCurrentUser() else {
+                return
             }
+            // Si el usuario está autenticado, actualiza la información del usuario
+            self.user = currentUser
+            
+            // Intenta cargar más detalles desde la base de datos
+            await getUserDetails()
         }
     }
+    
+    // Carga detalles adicionales del usuario desde la base de datos
+    func getUserDetails() async {
+        guard let currentUser = user else {
+            print("No user information available")
+            return
+        }
+        do {
+            if let userFromBD = try await userProfileRepository.getBSUser(authUser: currentUser) {
+                self.user = userFromBD
+            } else {
+                // Si el usuario no existe en la base de datos, créalo
+                try await userProfileRepository.createBDUser(authUser: currentUser)
+                let newUserFromBD = try await userProfileRepository.getBSUser(authUser: currentUser)
+                self.user = newUserFromBD
+                print("Created new user in database.")
+            }
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.showAlert = true
+        }
+    }
+    
     
     // Añade un libro a una lista específica
     func addBook(book: Book, to listType: BookListType) {
@@ -115,3 +132,4 @@ final class UserProfileViewModel: ObservableObject {
         }
     }
 }
+

@@ -68,7 +68,7 @@ struct BookDetailsInListView: View {
             .frame(maxWidth: .infinity, maxHeight: 100)
         }
         .sheet(isPresented: $showDetails) {
-            BookDetailsSheet(userProfileViewModel: userProfileViewModel, book: book)
+            //BookDetailsSheet(userProfileViewModel: userProfileViewModel, book: book)
             
         }
     }

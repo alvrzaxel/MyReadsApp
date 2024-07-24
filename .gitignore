@@ -1,3 +1,5 @@
 # Ignorar archivos .DS_Store
 .DS_Store
 Config.swift
+MyReads/MyReads/GoogleApi/Repository/Config.swift
+.DS_Store

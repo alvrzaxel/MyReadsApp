@@ -31,12 +31,8 @@ struct RootView: View {
                 .tag(1)
         }
         .accentColor(.loginRegistrerUnderline)
-        .onAppear {
-            authenticationViewModel.cleanErrorMessage()
-            if let user = authenticationViewModel.user {
-                userProfileViewModel.user = user
-            }
-        }
+        
+        
     }
 }
 

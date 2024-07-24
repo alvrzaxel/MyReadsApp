@@ -64,6 +64,7 @@ struct AuthenticationView: View {
         }
         .onAppear {
             authenticationViewModel.cleanErrorMessage()
+            authenticationViewModel.getCurrentUser()
         }
         
 //        .alert(isPresented: $authenticationViewModel.showAlert) {

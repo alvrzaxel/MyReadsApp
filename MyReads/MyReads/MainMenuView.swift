@@ -20,26 +20,17 @@ struct MainMenuView: View {
                     Label("Home", systemImage: "house")
                 }
                 .tag(0)
+                
+            
+            
             
             UserProfileView(authenticationViewModel: authenticationViewModel, userProfileViewModel: userProfileViewModel)
                 .tabItem {
                     Label("Profile", systemImage: "profile")
                 }
             
-            
-            
-            
-            
-        }
-        
-        .onAppear {
-            Task {
-                await userProfileViewModel.getCurrentUser()
-            }
         }
     }
 }
 
-#Preview {
-    MainMenuView(authenticationViewModel: AuthenticationViewModel(), userProfileViewModel: UserProfileViewModel())
-}
+

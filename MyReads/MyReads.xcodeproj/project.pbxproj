@@ -33,7 +33,6 @@
 		77D1A8A12C4BE22800B69CA6 /* AuthenticationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D1A8A02C4BE22800B69CA6 /* AuthenticationView.swift */; };
 		77D1A8A32C4BE22900B69CA6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77D1A8A22C4BE22900B69CA6 /* Assets.xcassets */; };
 		77D1A8A62C4BE22900B69CA6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77D1A8A52C4BE22900B69CA6 /* Preview Assets.xcassets */; };
-		77D1A8B62C4BE9AC00B69CA6 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 77D1A8B52C4BE9AC00B69CA6 /* FirebaseAnalytics */; };
 		77D1A8B82C4BE9AC00B69CA6 /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 77D1A8B72C4BE9AC00B69CA6 /* FirebaseAnalyticsSwift */; };
 		77D1A8BC2C4C093D00B69CA6 /* RegistrerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D1A8BB2C4C093D00B69CA6 /* RegistrerView.swift */; };
 		77D1A8BE2C4C0A1700B69CA6 /* DismissView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D1A8BD2C4C0A1700B69CA6 /* DismissView.swift */; };
@@ -52,6 +51,7 @@
 		77D1A8DF2C4D371700B69CA6 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D1A8DE2C4D371700B69CA6 /* UserProfileView.swift */; };
 		77D1A8E22C4D471E00B69CA6 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D1A8E12C4D471E00B69CA6 /* User.swift */; };
 		77D1A8E42C4D47CB00B69CA6 /* GoogleBooksResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D1A8E32C4D47CB00B69CA6 /* GoogleBooksResponse.swift */; };
+		77E37D3E2C51AB0B00865D2E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 77E37D3D2C51AB0B00865D2E /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -102,12 +102,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77E37D3E2C51AB0B00865D2E /* FirebaseAnalytics in Frameworks */,
 				77D1A8D32C4C384300B69CA6 /* GoogleSignInSwift in Frameworks */,
 				77D1A8B82C4BE9AC00B69CA6 /* FirebaseAnalyticsSwift in Frameworks */,
 				77D1A8D12C4C384300B69CA6 /* GoogleSignIn in Frameworks */,
 				776CEA9C2C5026350067B918 /* FirebaseFirestoreSwift in Frameworks */,
 				77D1A8C12C4C0E7500B69CA6 /* FirebaseAuth in Frameworks */,
-				77D1A8B62C4BE9AC00B69CA6 /* FirebaseAnalytics in Frameworks */,
 				776CEA9A2C5026350067B918 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -330,13 +330,13 @@
 			);
 			name = MyReads;
 			packageProductDependencies = (
-				77D1A8B52C4BE9AC00B69CA6 /* FirebaseAnalytics */,
 				77D1A8B72C4BE9AC00B69CA6 /* FirebaseAnalyticsSwift */,
 				77D1A8C02C4C0E7500B69CA6 /* FirebaseAuth */,
 				77D1A8D02C4C384300B69CA6 /* GoogleSignIn */,
 				77D1A8D22C4C384300B69CA6 /* GoogleSignInSwift */,
 				776CEA992C5026350067B918 /* FirebaseFirestore */,
 				776CEA9B2C5026350067B918 /* FirebaseFirestoreSwift */,
+				77E37D3D2C51AB0B00865D2E /* FirebaseAnalytics */,
 			);
 			productName = MyReads;
 			productReference = 77D1A89B2C4BE22800B69CA6 /* MyReads.app */;
@@ -670,10 +670,6 @@
 			package = 77D1A8AC2C4BE3E200B69CA6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestoreSwift;
 		};
-		77D1A8B52C4BE9AC00B69CA6 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = FirebaseAnalytics;
-		};
 		77D1A8B72C4BE9AC00B69CA6 /* FirebaseAnalyticsSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FirebaseAnalyticsSwift;
@@ -692,6 +688,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 77D1A8CF2C4C384300B69CA6 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		77E37D3D2C51AB0B00865D2E /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 77D1A8AC2C4BE3E200B69CA6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

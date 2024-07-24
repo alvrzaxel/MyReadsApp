@@ -36,13 +36,14 @@ final class AuthenticationViewModel: ObservableObject {
         self.authenticationRepository = authenticationRepository
         self.userProfileRepository = userProfileRepository
         
-        getCurrentUser()
+        
     }
     
     // Obtiene el usuario actual al iniciarse
     func getCurrentUser() {
         self.user = authenticationRepository.getCurrentUser()
     }
+    
     
     // Crea un nuevo usuario con correo y contraseña
     func createNewUser(email: String, password: String) {

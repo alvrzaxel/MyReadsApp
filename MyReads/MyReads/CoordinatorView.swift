@@ -15,10 +15,16 @@ struct CoordinatorView: View {
         Group {
             if authenticationViewModel.user != nil {
                 MainMenuView(authenticationViewModel: authenticationViewModel, userProfileViewModel: userProfileViewModel)
+                    .onAppear {
+                        print("Se cargan los datos del usuario")
+                        userProfileViewModel.loadCurrentUser()
+                    }
+                    
             } else {
                 AuthenticationView(authenticationViewModel: authenticationViewModel)
             }
         }
+        
     }
 }
 
