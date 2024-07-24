@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct Config {
+    static let googleApiKey: String = "AIzaSyD_7weyDggQNRoWowmf27OsLmpjwuq4smc"
+}

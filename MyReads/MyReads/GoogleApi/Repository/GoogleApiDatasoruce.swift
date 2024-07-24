@@ -10,14 +10,14 @@
 import Foundation
 
 class GoogleApiDatasoruce {
-    private let apiKey = "AIzaSyD_7weyDggQNRoWowmf27OsLmpjwuq4smc"
+    
     private let baseURL = "https://www.googleapis.com/books/v1/volumes"
     
     // Búsqueda genérica de libro
     func fetchBooks(query: String) async throws -> [Book] {
         // Escapamos el query para evistar probelmas con caracteres especiales
         let escapedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "\(baseURL)?q=\(escapedQuery)&key=\(apiKey)"
+        let urlString = "\(baseURL)?q=\(escapedQuery)&key=\(Config.googleApiKey)"
         print(urlString)
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -35,7 +35,7 @@ class GoogleApiDatasoruce {
     // Búsqueda por categoría
     func fetchBooks(byCategory category: String) async throws -> [Book] {
         let escapedCategory = category.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "\(baseURL)?q=subject:\(escapedCategory)&key=\(apiKey)"
+        let urlString = "\(baseURL)?q=subject:\(escapedCategory)&key=\(Config.googleApiKey)"
         
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -53,7 +53,7 @@ class GoogleApiDatasoruce {
     // Búsqueda por autor
     func fetchBooks(byAuthor author: String) async throws -> [Book] {
         let escapedAuthor = author.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "\(baseURL)?q=inauthor:\(escapedAuthor)&key=\(apiKey)"
+        let urlString = "\(baseURL)?q=inauthor:\(escapedAuthor)&key=\(Config.googleApiKey)"
         
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -71,7 +71,7 @@ class GoogleApiDatasoruce {
     
     // Búsqueda por id de libro
     func fetchBook(byId id: String) async throws -> Book? {
-        let urlString = "\(baseURL)/\(id)?key=\(apiKey)"
+        let urlString = "\(baseURL)/\(id)?key=\(Config.googleApiKey)"
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }

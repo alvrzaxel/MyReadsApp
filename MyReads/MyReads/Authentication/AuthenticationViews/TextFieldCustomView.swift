@@ -10,7 +10,11 @@ import SwiftUI
 struct TextFieldCustomView: View {
     @Binding var textFieldEmail: String
     @Binding var textFieldPassword: String
+    @Binding var isForgetPassword: Bool
+    var showForgetPassWord: Bool
+    
     @State private var isSecure: Bool = true
+    @State private var shoForgetPassWord = true
     
     @FocusState private var isEmailFieldFocused: Bool
     @FocusState private var isPasswordFieldFocused: Bool
@@ -91,12 +95,28 @@ struct TextFieldCustomView: View {
                     .frame(width: isPasswordFieldFocused ? 310 : 0, alignment: .leading)
                     .animation(.easeInOut(duration: 0.5), value: isPasswordFieldFocused)
             }.frame(height: 2)
+            
+            if (showForgetPassWord) {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        isForgetPassword.toggle()
+                    }) {
+                        Text("Forget password?")
+                            .padding(.vertical, 2)
+                            .padding(.trailing, 4)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.authenticationTitle2)
+                    }
+                }
+            }
+            
         }
     }
 }
 
 #Preview {
-    TextFieldCustomView(textFieldEmail: .constant(""), textFieldPassword: .constant(""))
+    TextFieldCustomView(textFieldEmail: .constant(""), textFieldPassword: .constant(""), isForgetPassword: .constant(false), showForgetPassWord: true)
 }
 
 

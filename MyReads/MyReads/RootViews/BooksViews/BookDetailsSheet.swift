@@ -13,14 +13,7 @@ struct BookDetailsSheet: View {
     
     var body: some View {
         Text(book.volumeInfo.title)
-        Button(action: {
-//            Task {
-//                await userProfileViewModel.addBookToWantToRead(bookId: book.id)
-//            }
-            
-        }, label: {
-            Text("Want to Read")
-        })
+
     }
 }
 

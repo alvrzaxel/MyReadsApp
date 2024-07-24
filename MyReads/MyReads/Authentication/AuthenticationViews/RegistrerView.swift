@@ -11,7 +11,6 @@ struct RegistrerView: View {
     @ObservedObject var authenticationViewModel: AuthenticationViewModel
     @State var textFieldEmail: String = ""
     @State var textFieldPassword: String = ""
-    
     @FocusState private var isEmailFieldFocused: Bool
     @FocusState private var isPasswordFieldFocused: Bool
     
@@ -39,7 +38,7 @@ struct RegistrerView: View {
                 }
                 
                 VStack {
-                    TextFieldCustomView(textFieldEmail: $textFieldEmail, textFieldPassword: $textFieldPassword)
+                    TextFieldCustomView(textFieldEmail: $textFieldEmail, textFieldPassword: $textFieldPassword, isForgetPassword: .constant(false), showForgetPassWord: false)
                     
                     Button("Sign up") {
                         authenticationViewModel.createNewUser(email: textFieldEmail, password: textFieldPassword)

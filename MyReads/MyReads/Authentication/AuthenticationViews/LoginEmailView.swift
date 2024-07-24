@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LoginEmailView: View {
     @ObservedObject var authenticationViewModel: AuthenticationViewModel
+    @Binding var isForgetPassword: Bool
     @State var textFieldEmail: String = ""
     @State var textFieldPassword: String = ""
     @State private var isSecure: Bool = true
@@ -32,7 +33,7 @@ struct LoginEmailView: View {
             }
             
             VStack {
-                TextFieldCustomView(textFieldEmail: $textFieldEmail, textFieldPassword: $textFieldPassword)
+                TextFieldCustomView(textFieldEmail: $textFieldEmail, textFieldPassword: $textFieldPassword, isForgetPassword: $isForgetPassword, showForgetPassWord: true)
                 
                 Button("Sign in") {
                     authenticationViewModel.login(email: textFieldEmail, password: textFieldPassword)
@@ -55,5 +56,5 @@ struct LoginEmailView: View {
     }
 }
 #Preview {
-    LoginEmailView(authenticationViewModel: AuthenticationViewModel())
+    LoginEmailView(authenticationViewModel: AuthenticationViewModel(), isForgetPassword: .constant(false))
 }

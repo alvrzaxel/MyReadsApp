@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		77556EDC2C51695B00AB3891 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77556EDB2C51695B00AB3891 /* MainMenuView.swift */; };
+		77556EDE2C5178F900AB3891 /* ForgetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77556EDD2C5178F900AB3891 /* ForgetPasswordView.swift */; };
+		77556EE02C517F8800AB3891 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77556EDF2C517F8800AB3891 /* Config.swift */; };
 		775DE05A2C50F3C100A22337 /* CoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775DE0592C50F3C100A22337 /* CoordinatorView.swift */; };
 		776CEA822C4FE2F70067B918 /* HomeGenres.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776CEA812C4FE2F70067B918 /* HomeGenres.swift */; };
 		776CEA842C4FE5DE0067B918 /* HomeNew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776CEA832C4FE5DE0067B918 /* HomeNew.swift */; };
@@ -54,6 +56,8 @@
 
 /* Begin PBXFileReference section */
 		77556EDB2C51695B00AB3891 /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
+		77556EDD2C5178F900AB3891 /* ForgetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgetPasswordView.swift; sourceTree = "<group>"; };
+		77556EDF2C517F8800AB3891 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		775DE0592C50F3C100A22337 /* CoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorView.swift; sourceTree = "<group>"; };
 		776CEA812C4FE2F70067B918 /* HomeGenres.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeGenres.swift; sourceTree = "<group>"; };
 		776CEA832C4FE5DE0067B918 /* HomeNew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeNew.swift; sourceTree = "<group>"; };
@@ -189,6 +193,7 @@
 				77D1A8BB2C4C093D00B69CA6 /* RegistrerView.swift */,
 				77D1A8D82C4D2D3500B69CA6 /* TextFieldCustomView.swift */,
 				77D1A8BD2C4C0A1700B69CA6 /* DismissView.swift */,
+				77556EDD2C5178F900AB3891 /* ForgetPasswordView.swift */,
 			);
 			path = AuthenticationViews;
 			sourceTree = "<group>";
@@ -198,6 +203,7 @@
 			children = (
 				77B385FA2C4EDE7E00C800BD /* GoogleApiRepository.swift */,
 				77B385F82C4EDE6600C800BD /* GoogleApiDatasoruce.swift */,
+				77556EDF2C517F8800AB3891 /* Config.swift */,
 			);
 			path = Repository;
 			sourceTree = "<group>";
@@ -405,8 +411,10 @@
 				77D1A8BC2C4C093D00B69CA6 /* RegistrerView.swift in Sources */,
 				776CEAA32C5059B80067B918 /* LoginEmailView.swift in Sources */,
 				77D1A8C42C4C103600B69CA6 /* AuthenticationFirebaseDatasource.swift in Sources */,
+				77556EDE2C5178F900AB3891 /* ForgetPasswordView.swift in Sources */,
 				776CEA822C4FE2F70067B918 /* HomeGenres.swift in Sources */,
 				77D1A8E42C4D47CB00B69CA6 /* GoogleBooksResponse.swift in Sources */,
+				77556EE02C517F8800AB3891 /* Config.swift in Sources */,
 				777E7B6C2C4FAA8500EFFBAC /* SearchBar.swift in Sources */,
 				77556EDC2C51695B00AB3891 /* MainMenuView.swift in Sources */,
 				776CEA982C5024D20067B918 /* UserProfileDatasource.swift in Sources */,

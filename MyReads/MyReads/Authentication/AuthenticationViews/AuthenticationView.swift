@@ -10,6 +10,7 @@ import GoogleSignInSwift
 
 struct AuthenticationView: View {
     @ObservedObject var authenticationViewModel: AuthenticationViewModel
+    @State var isForgetPassword: Bool = false
     @State private var isShowingRegisterView: Bool = false
     
     var body: some View {
@@ -20,7 +21,7 @@ struct AuthenticationView: View {
                 .resizable()
                 .frame(width: 200, height: 200)
             
-            LoginEmailView(authenticationViewModel: authenticationViewModel)
+            LoginEmailView(authenticationViewModel: authenticationViewModel, isForgetPassword: $isForgetPassword)
             
             HStack {
                 VStack { Divider() }
@@ -38,7 +39,7 @@ struct AuthenticationView: View {
                 Button {
                     isShowingRegisterView = true
                 } label: {
-                    Text("You do not have an account? Sign up.")
+                    Text("Don't have an account? Sign up")
                         .foregroundStyle(.authenticationNoAccount)
                 }
                 .font(.system(size: 12, weight: .light))
@@ -56,6 +57,14 @@ struct AuthenticationView: View {
         }
         .padding(.horizontal, 40)
         .frame(maxWidth: .infinity)
+        .background(.authenticationBackground)
+        .sheet(isPresented: $isForgetPassword) {
+            ForgetPasswordView(authenticationViewModel: authenticationViewModel, isForgetPassword: $isForgetPassword)
+                .presentationDetents([.medium, .large])
+        }
+        .onAppear {
+            authenticationViewModel.cleanErrorMessage()
+        }
         
 //        .alert(isPresented: $authenticationViewModel.showAlert) {
 //                    Alert(title: Text("Error"), message: Text(authenticationViewModel.messageError ?? "Unknown error"), dismissButton: .default(Text("OK"), action: {
