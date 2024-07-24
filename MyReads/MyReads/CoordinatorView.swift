@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct CoordinatorView: View {
     @ObservedObject var authenticationViewModel: AuthenticationViewModel
     @StateObject var userProfileViewModel = UserProfileViewModel()
     
@@ -26,6 +26,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(authenticationViewModel: AuthenticationViewModel(), userProfileViewModel: UserProfileViewModel())
+    CoordinatorView(authenticationViewModel: AuthenticationViewModel(), userProfileViewModel: UserProfileViewModel())
     
 }

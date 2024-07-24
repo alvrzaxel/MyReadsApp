@@ -9,7 +9,7 @@
 
 import Foundation
 
-class GoogleApiData {
+class GoogleApiDatasoruce {
     private let apiKey = "AIzaSyD_7weyDggQNRoWowmf27OsLmpjwuq4smc"
     private let baseURL = "https://www.googleapis.com/books/v1/volumes"
     
