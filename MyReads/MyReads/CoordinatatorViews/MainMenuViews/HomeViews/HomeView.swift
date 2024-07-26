@@ -10,32 +10,46 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
-    
-    @State var textSearch: String = ""
+
     @State var isLoading: Bool = false
-    @State var isVisible: Bool = false
+    
     
     var body: some View {
-        VStack {
+        ZStack {
+            Color.generalBackground.ignoresSafeArea()
             
-            Text(userProfileViewModel.user?.email ?? "noemail")
-            Text(userProfileViewModel.user?.email ?? "noemail")
-            Text(userProfileViewModel.user?.photoURL ?? "nophoto")
-            
-            if isVisible {
-                SearchResultsView(googleApiViewModel: googleApiViewModel, userProfileViewModel: userProfileViewModel, isVisible: $isVisible)
-                
-            } else {
-                ScrollView {
-                    VStack {
-                        HomeNew()
+            ScrollView {
+                VStack {
+                   
+                    if !googleApiViewModel.books.isEmpty {
+                        ForEach(googleApiViewModel.books, id: \.id) { book in
+                            Text(book.volumeInfo.title)
+                        }
+                    } else {
+                        
                     }
-                    HomeGenres()
+                    Spacer()
+                   
                 }
-                .background(.generalBackground)
             }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         }
-        .background(.generalBackground)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .safeAreaInset(edge: .top) {
             VStack(spacing: .zero) {
                 Image(.iconBar)
@@ -43,21 +57,10 @@ struct HomeView: View {
                     .scaledToFit()
                     .frame(height: 35)
                     .padding(.vertical, 10)
-                SearchBar(googleApiViewModel: googleApiViewModel, textSearch: $textSearch, isLoading: $isLoading, isVisible: $isVisible)
-                    .frame(maxHeight: 50)
-            }
-            .background(.generalBackground.opacity(0.98))
-            
+                CircleMagnifyingGlass(googleApiViewModel: googleApiViewModel)
+  
+            }.background(.generalBackground.opacity(0.98))
         }
-        .overlay {
-            PlusView()
-                
-        }
-//        .onAppear {
-//                userProfileViewModel.loadCurrentUser()
-//        }
-        
-        
     }
 }
 

@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct MyBooksView: View {
+    @State var show: Bool = false
     var body: some View {
         VStack {
-            
+            Color.generalBackground.ignoresSafeArea()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.generalBackground)
         .safeAreaInset(edge: .top) {
             VStack(spacing: .zero) {
                 Image(.iconBar)
@@ -21,6 +21,7 @@ struct MyBooksView: View {
                     .scaledToFit()
                     .frame(height: 35)
                     .padding(.vertical, 10)
+                //CircleMagnifyingGlass()
                 
             }
             .background(.generalBackground.opacity(0.98))
