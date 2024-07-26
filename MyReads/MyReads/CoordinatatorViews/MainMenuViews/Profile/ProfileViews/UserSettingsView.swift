@@ -8,72 +8,60 @@
 import SwiftUI
 
 struct UserSettingsView: View {
-    @ObservedObject var authenticationViewModel: AuthenticationViewModel
+    @EnvironmentObject var authenticationViewModel: AuthenticationViewModel
+    @ObservedObject var userProfileViewModel: UserProfileViewModel
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        Form {
-            Section {
-                VStack(alignment: .leading) {
-                    Text("User name: \(authenticationViewModel.user?.uid ?? "000")")
-                    Text("Email: \(authenticationViewModel.user?.email ?? "No email")")
-                }.foregroundStyle(.gray)
+        VStack {
+            List {
+                Section(header: Text("Profile")) {
+                    VStack(alignment: .leading) {
+                        Text("User name: \(userProfileViewModel.user?.uid ?? "000")")
+                        Text("Email: \(userProfileViewModel.user?.email ?? "No email")")
+                    }.foregroundStyle(.gray)
+                }
                 
-                
-            }
-            
-            // Sección ajustes de la cuenta
-            Section {
-                Button("Reset password") {
-                    guard let email = authenticationViewModel.user?.email else {
-                        
-                        print("Email not available for password reset.")
-                        return
+                Section(header: Text("Account")) {
+                    Button("Update password") {
+                        let password = "123456789"
+                        authenticationViewModel.updatePassword(newPassword: password)
                     }
-                    authenticationViewModel.resetPassword(email: email)
                 }
                 
-                Button("Update password") {
-                    let password = "123456789"
-                    authenticationViewModel.updatePassword(newPassword: password)
+                Section(header: Text("Settings Account")) {
+                    VStack {
+                        ProviderView(authenticationViewModel: authenticationViewModel)
+                    }
+                    Button("Sign out") {
+                        authenticationViewModel.logout()
+                        
+                    }.foregroundStyle(.red)
                 }
-            } header: {
-                Text("settings Account")
-            }
-            
-            // Sección Provider/LogOut
-            Section {
-                VStack {
-                    ProviderView(authenticationViewModel: authenticationViewModel)
-                }
-                Button("Sign out") {
-                    authenticationViewModel.logout()
-                }.foregroundStyle(.red)
                 
-            }header: {
-                Text("Connected acounsts")
+                Section(header: Text("Settings Account")) {
+                    Button("Delete account") {
+                        authenticationViewModel.deleteAccount()
+                        userProfileViewModel.deleteUserProfile()
+                        print("Delete!")
+                    }.font(.headline)
+                        .foregroundStyle(.red)
+                }
+                
             }
             
-            // Sección DELETE
-            Section {
-                Button("Delete account") {
-                    //TODO
-                }.font(.headline)
-                    .foregroundStyle(.red)
-            }
+            
+            
+            
+            
+            
+            .onChange(of: authenticationViewModel.shouldDismiss) { oldValue, newValue in
+                if newValue {
+                    dismiss()
+                }
         }
-        .alert(isPresented: $authenticationViewModel.showAlert) {
-            Alert(
-                title: Text("Password Reset"),
-                message: Text(authenticationViewModel.alertMessage ?? "An unknown error occurred."),
-                dismissButton: .default(Text("OK"))
-            )
         }
-        .onChange(of: authenticationViewModel.shouldDismiss) { oldValue, newValue in
-            if newValue {
-                dismiss()
-            }
-        }
+        
     }
 }
 
@@ -133,7 +121,8 @@ struct ProviderView:View {
 }
 
 #Preview {
-    UserSettingsView(authenticationViewModel: AuthenticationViewModel())
+    UserSettingsView(userProfileViewModel: UserProfileViewModel())
+        .environmentObject(AuthenticationViewModel())
     
 }
 

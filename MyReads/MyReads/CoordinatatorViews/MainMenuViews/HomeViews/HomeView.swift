@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var authenticationViewModel: AuthenticationViewModel
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
     
@@ -19,12 +18,12 @@ struct HomeView: View {
     var body: some View {
         VStack {
             
-            Text(authenticationViewModel.user?.email ?? "noemail")
+            Text(userProfileViewModel.user?.email ?? "noemail")
             Text(userProfileViewModel.user?.email ?? "noemail")
             Text(userProfileViewModel.user?.photoURL ?? "nophoto")
             
             if isVisible {
-                SearchResultsView(authenticationViewModel: authenticationViewModel, googleApiViewModel: googleApiViewModel, userProfileViewModel: userProfileViewModel, isVisible: $isVisible)
+                SearchResultsView(googleApiViewModel: googleApiViewModel, userProfileViewModel: userProfileViewModel, isVisible: $isVisible)
                 
             } else {
                 ScrollView {
@@ -44,11 +43,15 @@ struct HomeView: View {
                     .scaledToFit()
                     .frame(height: 35)
                     .padding(.vertical, 10)
-                SearchBar(authenticationViewModel: authenticationViewModel, googleApiViewModel: googleApiViewModel, textSearch: $textSearch, isLoading: $isLoading, isVisible: $isVisible)
+                SearchBar(googleApiViewModel: googleApiViewModel, textSearch: $textSearch, isLoading: $isLoading, isVisible: $isVisible)
                     .frame(maxHeight: 50)
             }
             .background(.generalBackground.opacity(0.98))
             
+        }
+        .overlay {
+            PlusView()
+                
         }
 //        .onAppear {
 //                userProfileViewModel.loadCurrentUser()
@@ -58,8 +61,15 @@ struct HomeView: View {
     }
 }
 
-#Preview {
+#Preview("Ligth") {
     NavigationStack {
-        HomeView(authenticationViewModel: AuthenticationViewModel(), userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
+        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
     }
+}
+
+#Preview("Dark") {
+    NavigationStack {
+        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
+    }
+    .preferredColorScheme(.dark)
 }

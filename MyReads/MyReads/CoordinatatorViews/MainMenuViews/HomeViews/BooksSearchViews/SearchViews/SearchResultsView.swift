@@ -10,7 +10,6 @@ import SwiftUI
 import SwiftUI
 
 struct SearchResultsView: View {
-    @ObservedObject var authenticationViewModel: AuthenticationViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @Binding var isVisible: Bool
@@ -40,6 +39,6 @@ struct SearchResultsView: View {
 }
 
 #Preview {
-    SearchResultsView(authenticationViewModel: AuthenticationViewModel(), googleApiViewModel: GoogleApiViewModel(), userProfileViewModel: UserProfileViewModel(), isVisible: .constant(true))
+    SearchResultsView(googleApiViewModel: GoogleApiViewModel(), userProfileViewModel: UserProfileViewModel(), isVisible: .constant(true))
     
 }

@@ -7,15 +7,14 @@
 
 import Foundation
 
-struct GoogleBooksResponse: Codable {
-    let items: [Book]
+struct GoogleBooksResponseModel: Codable {
+    let items: [GoogleBookModel]
 }
 
-struct Book: Codable, Identifiable {
+struct GoogleBookModel: Codable, Identifiable {
     let id: String
-    let etag: String
-    let selfLink: String
     let volumeInfo: VolumeInfo
+    let saleInfo: SaleInfo
 }
 
 struct VolumeInfo: Codable {
@@ -23,6 +22,7 @@ struct VolumeInfo: Codable {
     let authors: [String]?
     let publishedDate: String?
     let description: String?
+    let industryIdentifiers: [IndustryIdentifiers]?
     let pageCount: Int?
     let categories: [String]?
     let averageRating: Double?
@@ -30,6 +30,16 @@ struct VolumeInfo: Codable {
     let language: String?
 }
 
+struct IndustryIdentifiers: Codable {
+    let type: String
+    let identifier: String
+}
+
 struct ImageLinks: Codable {
+    let smallThumbnail: String?
     let thumbnail: String?
+}
+
+struct SaleInfo: Codable {
+    let isEbook: Bool
 }

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SearchBar: View {
-    @ObservedObject var authenticationViewModel: AuthenticationViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
     
     @Binding var textSearch: String
@@ -110,5 +109,5 @@ struct isFocusedTextCancel: View {
 }
 
 #Preview {
-    SearchBar(authenticationViewModel: AuthenticationViewModel(), googleApiViewModel: GoogleApiViewModel(), textSearch: .constant(""), isLoading: .constant(false), isVisible: .constant(true))
+    SearchBar(googleApiViewModel: GoogleApiViewModel(), textSearch: .constant(""), isLoading: .constant(false), isVisible: .constant(true))
 }

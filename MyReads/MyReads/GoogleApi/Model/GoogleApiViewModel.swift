@@ -9,8 +9,8 @@ import Foundation
 
 @MainActor
 class GoogleApiViewModel: ObservableObject {
-    @Published var books: [Book] = []
-    @Published var selectedBook: Book?
+    @Published var books: [GoogleBookModel] = []
+    @Published var selectedBook: GoogleBookModel?
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     

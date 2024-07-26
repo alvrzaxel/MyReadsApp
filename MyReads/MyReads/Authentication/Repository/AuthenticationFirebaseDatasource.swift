@@ -15,37 +15,69 @@ final class AuthenticationFirebaseDatasource {
     private let googleAuthentication = GoogleAuthentication()
     
     // Obtiene el usuario actualmente autenticado
-    func getCurrentUser() -> User? {
+    func getCurrentUser() -> UserModel? {
         guard let user = Auth.auth().currentUser else {
             return nil
         }
         
-        return User(uid: user.uid, email: user.email ?? "No Email", photoURL: user.photoURL?.absoluteString)
+        return UserModel(
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            emailVerified: user.isEmailVerified,
+            photoURL: user.photoURL?.absoluteString,
+            providerID: user.providerData.first?.providerID,
+            creationDate: user.metadata.creationDate
+        )
     }
     
-    // Crea y retorna un objeto `User` con la información del usuario autenticado
-    func createNewUser(email: String, password: String) async throws -> User {
+    // Crea y retorna un objeto `UserModel` con la información del usuario autenticado
+    func createNewUser(email: String, password: String) async throws -> UserModel {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
         
-        let user = User(uid: authDataResult.user.uid, email: authDataResult.user.email ?? "No email", photoURL: authDataResult.user.photoURL?.absoluteString)
-        
-        return user
+        let user = authDataResult.user
+        return UserModel(
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            emailVerified: user.isEmailVerified,
+            photoURL: user.photoURL?.absoluteString,
+            providerID: user.providerData.first?.providerID,
+            creationDate: user.metadata.creationDate
+        )
     }
     
     // Inicia sesión con correo electrónico y contraseña
-    func login(email: String, password: String) async throws -> User {
+    func login(email: String, password: String) async throws -> UserModel {
         let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
         
-        return User(uid: authDataResult.user.uid, email: authDataResult.user.email ?? "No Email", photoURL: authDataResult.user.photoURL?.absoluteString)
+        let user = authDataResult.user
+        return UserModel(
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            emailVerified: user.isEmailVerified,
+            photoURL: user.photoURL?.absoluteString,
+            providerID: user.providerData.first?.providerID,
+            creationDate: user.metadata.creationDate
+        )
     }
     
     // Inicia sesión con Google
-    func loginWithGoogle() async throws -> User {
+    func loginWithGoogle() async throws -> UserModel {
         let credential = try await googleAuthentication.signInWithGoogle()
-        let authDataResutl = try await Auth.auth().signIn(with: credential)
-        let autUser = authDataResutl.user
+        let authDataResult = try await Auth.auth().signIn(with: credential)
+        let user = authDataResult.user
         
-        return User(uid: autUser.uid, email: autUser.email ?? "No Email", photoURL: autUser.photoURL?.absoluteString)
+        return UserModel(
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            emailVerified: user.isEmailVerified,
+            photoURL: user.photoURL?.absoluteString,
+            providerID: user.providerData.first?.providerID,
+            creationDate: user.metadata.creationDate
+        )
     }
     
     // Actualiza la contraseña del usuario actual

@@ -19,22 +19,22 @@ final class AuthenticationRepository {
     }
     
     // Obtiene el usuario actualmente autenticado
-    func getCurrentUser() -> User? {
+    func getCurrentUser() -> UserModel? {
         authenticationFirebaseDatasource.getCurrentUser()
     }
     
     // Crea un nuevo usuario con correo electronico y contraseña
-    func createNewUser(email: String, password: String) async throws -> User {
+    func createNewUser(email: String, password: String) async throws -> UserModel {
         try await authenticationFirebaseDatasource.createNewUser(email: email, password: password)
     }
     
     // Inicia sesion con correo electronico y contrasena
-    func login(email: String, password: String) async throws -> User {
+    func login(email: String, password: String) async throws -> UserModel {
         try await authenticationFirebaseDatasource.login(email: email, password: password)
     }
     
     // Inicia sesion con Google
-    func loginWithGoogle() async throws -> User {
+    func loginWithGoogle() async throws -> UserModel {
         return try await authenticationFirebaseDatasource.loginWithGoogle()
     }
     

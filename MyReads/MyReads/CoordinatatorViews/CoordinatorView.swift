@@ -14,11 +14,13 @@ struct CoordinatorView: View {
     var body: some View {
         Group {
             if authenticationViewModel.user != nil {
-                MainMenuView(authenticationViewModel: authenticationViewModel, userProfileViewModel: userProfileViewModel)
+                MainMenuView(userProfileViewModel: userProfileViewModel)
+                    .environmentObject(authenticationViewModel)
                     .onAppear {
                         print("Se cargan los datos del usuario")
                         userProfileViewModel.loadCurrentUser()
                     }
+                    
                     
             } else {
                 AuthenticationView(authenticationViewModel: authenticationViewModel)

@@ -15,22 +15,22 @@ class GoogleApiRepository {
     }
     
     // Busca libros usando una consulta genérica
-    func searchBooks(query: String) async throws -> [Book] {
+    func searchBooks(query: String) async throws -> [GoogleBookModel] {
         return try await googleApiDatasoruce.fetchBooks(query: query)
     }
     
     // Busca libros por su cateogria
-    func searchBooks(byCategory category: String) async throws -> [Book] {
+    func searchBooks(byCategory category: String) async throws -> [GoogleBookModel] {
         return try await googleApiDatasoruce.fetchBooks(byCategory: category)
     }
     
     // Busca libros por su autor
-    func searchBooks(byAuthor author: String) async throws -> [Book] {
+    func searchBooks(byAuthor author: String) async throws -> [GoogleBookModel] {
         try await googleApiDatasoruce.fetchBooks(byAuthor: author)
     }
     
     // Busca un libro por su ID
-    func getBook(byID id: String) async throws -> Book? {
+    func getBook(byID id: String) async throws -> GoogleBookModel? {
         try await googleApiDatasoruce.fetchBook(byId: id)
     }
 }

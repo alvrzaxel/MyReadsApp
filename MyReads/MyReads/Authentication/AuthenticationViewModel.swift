@@ -16,7 +16,7 @@ import GoogleSignInSwift
 // Anotacion para indicar que este viewmodel se ejecutara en el actor principal
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
-    @Published var user: User?
+    @Published var user: UserModel?
     @Published var messageError: String?
     @Published var linkedAccounts: [LinkedAccounts] = []
     @Published var showAlert: Bool = false
@@ -50,22 +50,21 @@ final class AuthenticationViewModel: ObservableObject {
         Task {
             do {
                 let newUser = try await authenticationRepository.createNewUser(email: email, password: password)
-                try await userProfileRepository.createBDUser(authUser: newUser)
-                self.user = user
+                self.user = newUser
             } catch {
                 self.messageError = error.localizedDescription
                 self.showAlert = true
             }
         }
     }
+    
     
     // Inicia sesión con correo y contraseña
     func login(email: String, password: String) {
         Task {
             do {
                 let loggedInUser = try await authenticationRepository.login(email: email, password: password)
-                let userFromBD = try await userProfileRepository.getBSUser(authUser: loggedInUser)
-                self.user = userFromBD
+                self.user = loggedInUser
             } catch {
                 self.messageError = error.localizedDescription
                 self.showAlert = true
@@ -73,18 +72,23 @@ final class AuthenticationViewModel: ObservableObject {
         }
     }
     
-    // Inicia sesion con Google
     func loginWithGoogle() {
         Task {
             do {
                 let googleUser = try await authenticationRepository.loginWithGoogle()
+
+                let existingUser = try? await userProfileRepository.getUserDocument(user: googleUser)
                 
-                if let existingUser = try await userProfileRepository.getBSUser(authUser: googleUser) {
+                if let existingUser = existingUser {
                     self.user = existingUser
                 } else {
-                    try await userProfileRepository.createBDUser(authUser: googleUser)
+                    try await userProfileRepository.createUserDocument(user: googleUser)
                     self.user = googleUser
                 }
+                
+               
+                
+                // Actualiza el perfil del usuario, si es necesario
                 
             } catch {
                 self.messageError = error.localizedDescription
@@ -99,6 +103,7 @@ final class AuthenticationViewModel: ObservableObject {
         self.messageError = nil
     }
     
+    
     // Actualiza la contraseña del usuario
     func updatePassword(newPassword: String) {
         Task {
@@ -111,6 +116,7 @@ final class AuthenticationViewModel: ObservableObject {
             self.showAlert = true
         }
     }
+    
     
     // Restablece la contraseña del usuario
     func resetPassword(email: String) {
@@ -125,6 +131,7 @@ final class AuthenticationViewModel: ObservableObject {
         }
     }
     
+    
     // Cierra la sesión del usuario
     func logout() {
         do {
@@ -136,24 +143,34 @@ final class AuthenticationViewModel: ObservableObject {
         }
     }
     
+    
     // Elimina la cuenta del usuario
-    func deleteAccount() async {
-        do {
-            try await authenticationRepository.deleteAcount()
-        } catch {
-            self.alertMessage = "Error deleting user account"
+    func deleteAccount()  {
+        Task {
+            do {
+                try await authenticationRepository.deleteAcount()
+                self.user = nil
+                self.shouldDismiss = true
+                
+            } catch {
+                self.alertMessage = "Error deleting user account"
+            }
         }
+        
     }
+    
     
     // Obtiene los proveedores de autenticacion vinculados al usuario actual
     func getCurrentProvider() {
         linkedAccounts = authenticationRepository.getCurrentProvider()
     }
     
+    
     // Verifica si la cuenta de correo y contraseña esta vinculada
     func isEmailAndPasswordLinked() -> Bool {
         linkedAccounts.contains(where: { $0.rawValue == "password"})
     }
+    
     
     // Verifica si la cuenta de Google esta vinculada
     func isGoogleLinked() -> Bool {
