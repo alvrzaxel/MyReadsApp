@@ -15,7 +15,7 @@ struct CircleMagnifyingGlass: View {
     var body: some View {
         HStack {
             RoundedRectangle(cornerRadius: 20)
-                .frame(width: showSearchTextField ? 270 : 35, height: showSearchTextField ? 35 : 35)
+                .frame(width: showSearchTextField ? 270 : 30, height: showSearchTextField ? 30 : 30)
                 .foregroundStyle(.barSearchBackGround)
                 .overlay {
                     SearchTextField(googleApiViewModel: googleApiViewModel, textToSearch: $textToSearch, showSearchTextField: $showSearchTextField)
@@ -25,8 +25,10 @@ struct CircleMagnifyingGlass: View {
                 Spacer()
                 Button(action: {
                     withAnimation(.snappy) {
+                        UIApplication.shared.hideKeyboard()
                         showSearchTextField.toggle()
-                        googleApiViewModel.books = []
+                        googleApiViewModel.booksResultSearch = nil
+                        textToSearch = ""
                     }
                 }, label: {
                     Text("Cancel")
@@ -34,9 +36,9 @@ struct CircleMagnifyingGlass: View {
                 Spacer()
             }
         }
+        .padding(.horizontal, 24)
         .frame(maxWidth: .infinity, maxHeight: 45, alignment: .topLeading)
-        .padding(.horizontal, 20)
-        .background(.generalBackground.opacity(0.5))
+        
     }
 }
 
@@ -70,19 +72,24 @@ struct SearchTextField:View {
                     .frame(width: 205).frame(maxHeight: .infinity)
                     .foregroundStyle(.searchBarText)
                     .onSubmit {
+                        googleApiViewModel.isLoading = true
                         Task {
+                            print(textToSearch)
+                            UIApplication.shared.hideKeyboard()
                             await googleApiViewModel.searchBooks(query: textToSearch)
                         }
+                        googleApiViewModel.isLoading = false
                     }
                     .overlay {
                         ButtonDeleteTextField(isFocused: _isTextFieldFocused, textToSearch: $textToSearch)
                     }
-
+                    
                 }
             }
             Spacer()
             
         }
+
     }
 }
 
@@ -96,6 +103,7 @@ struct ButtonDeleteTextField:View {
             if !textToSearch.isEmpty {
                 Button(action: {
                     textToSearch = ""
+                    isFocused = true
                 }) {
                     Image(systemName: "x.circle.fill")
                         .font(.system(size: 16))

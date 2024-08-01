@@ -8,30 +8,34 @@
 import Foundation
 
 class GoogleApiRepository {
-    private let googleApiDatasoruce: GoogleApiDatasoruce
+    private let googleApiDatasource: GoogleApiDatasoruce
     
-    init(googleApiData: GoogleApiDatasoruce = GoogleApiDatasoruce()) {
-        self.googleApiDatasoruce = googleApiData
+    init(googleApiDatasource: GoogleApiDatasoruce = GoogleApiDatasoruce()) {
+        self.googleApiDatasource = googleApiDatasource
     }
     
-    // Busca libros usando una consulta genérica
-    func searchBooks(query: String) async throws -> [GoogleBookModel] {
-        return try await googleApiDatasoruce.fetchBooks(query: query)
+    /// Busca libros usando una consulta genérica
+    func searchBooks(query: String) async throws -> [UserBookModel] {
+        let googleBooks = try await googleApiDatasource.fetchBooks(query: query)
+        return googleBooks
     }
     
-    // Busca libros por su cateogria
-    func searchBooks(byCategory category: String) async throws -> [GoogleBookModel] {
-        return try await googleApiDatasoruce.fetchBooks(byCategory: category)
+    /// Busca libros por su categoría
+    func searchBooks(byCategory category: String) async throws -> [UserBookModel] {
+        let googleBooks = try await googleApiDatasource.fetchBooks(byCategory: category)
+        return googleBooks
     }
     
-    // Busca libros por su autor
-    func searchBooks(byAuthor author: String) async throws -> [GoogleBookModel] {
-        try await googleApiDatasoruce.fetchBooks(byAuthor: author)
+    /// Busca libros por su autor
+    func searchBooks(byAuthor author: String) async throws -> [UserBookModel] {
+        let googleBooks = try await googleApiDatasource.fetchBooks(byAuthor: author)
+        return googleBooks
     }
     
-    // Busca un libro por su ID
-    func getBook(byID id: String) async throws -> GoogleBookModel? {
-        try await googleApiDatasoruce.fetchBook(byId: id)
+    /// Busca un libro por su ID
+    func getBook(byID id: String) async throws -> UserBookModel? {
+        let googleBook = try await googleApiDatasource.fetchBook(byId: id)
+        return googleBook
     }
 }
 

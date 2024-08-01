@@ -20,7 +20,6 @@ final class UserProfileRepository {
         self.userProfileDataSource = userProfileDataSource
     }
     
-    
     // Crea un nuevo documento para el usuario en la base de datos
     func createUserDocument(user: UserModel) async throws {
         try await userProfileDataSource.createUserDocument(user: user)

@@ -108,13 +108,4 @@ final class AuthenticationFirebaseDatasource {
         try await user.delete()
     }
     
-    // Obtiene los proveedores de autenticación del usuario actual
-    func currentProvider() -> [LinkedAccounts] {
-        guard let currenUser = Auth.auth().currentUser else {
-            return []
-        }
-        
-        return currenUser.providerData.compactMap { LinkedAccounts(rawValue: $0.providerID) }
-    }
-    
 }

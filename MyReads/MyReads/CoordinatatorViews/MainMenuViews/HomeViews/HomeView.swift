@@ -10,59 +10,50 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
-
-    @State var isLoading: Bool = false
-    
     
     var body: some View {
         ZStack {
-            Color.generalBackground.ignoresSafeArea()
+            Color.backgroundGeneral.ignoresSafeArea()
             
-            ScrollView {
-                VStack {
-                   
-                    if !googleApiViewModel.books.isEmpty {
-                        ForEach(googleApiViewModel.books, id: \.id) { book in
-                            Text(book.volumeInfo.title)
-                        }
-                    } else {
-                        
-                    }
-                    Spacer()
-                   
+            VStack {
+                if googleApiViewModel.booksResultSearch != nil {
+                    SearchResultsView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
+                    
+                } else {
+                    
+                    HomeWelcome(name: userProfileViewModel.user.displayName)
+                    HomeGenres(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
                 }
             }
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .safeAreaInset(edge: .top) {
-            VStack(spacing: .zero) {
-                Image(.iconBar)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 35)
-                    .padding(.vertical, 10)
-                CircleMagnifyingGlass(googleApiViewModel: googleApiViewModel)
-  
-            }.background(.generalBackground.opacity(0.98))
-        }
+        .safeAreaInset(edge: .top, content: {
+            NavBarHome(googleApiViewModel: googleApiViewModel)
+        })
     }
 }
+
+struct NavBarHome: View {
+    @ObservedObject var googleApiViewModel: GoogleApiViewModel
+    
+    var body: some View {
+        VStack {
+            Image(.iconBar)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 30)
+                
+        }
+        .frame(maxWidth: .infinity, maxHeight: 50)
+        .padding(.bottom, 10)
+        .background(.backgroundGeneral.opacity(0.95))
+        .overlay {
+            CircleMagnifyingGlass(googleApiViewModel: googleApiViewModel)
+                .offset(y: 2)
+        }
+        
+    }
+}
+
 
 #Preview("Ligth") {
     NavigationStack {
@@ -76,3 +67,5 @@ struct HomeView: View {
     }
     .preferredColorScheme(.dark)
 }
+
+

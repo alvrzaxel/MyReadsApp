@@ -22,9 +22,17 @@ struct AsyncImageView: View {
             case .success(let image):
                 image
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    //.aspectRatio(contentMode: .fit)
             case .failure(_):
-                Text("Failed to load image")
+                
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(.textFieldPlaceholder.opacity(0.05))
+                    .frame(width: 70, height: 100)
+                    .overlay {
+                        Text("Failed to load image").font(.system(size: 12, weight: .ultraLight)).padding(4)
+                    }
+                
+                
             @unknown default:
                 Text("Unknown error")
             }

@@ -15,10 +15,9 @@ struct RegistrerView: View {
     @FocusState private var isEmailFieldFocused: Bool
     @FocusState private var isPasswordFieldFocused: Bool
     
-    
     var body: some View {
         ZStack {
-            Color.authenticationBackground.ignoresSafeArea()
+            Color.backgroundGeneral.ignoresSafeArea()
             
             VStack {
                 DismissView()
@@ -29,22 +28,24 @@ struct RegistrerView: View {
                         HStack() {
                             Text("Welcome!")
                                 .font(.system(size: 18, weight: .semibold))
-                                .foregroundStyle(.authenticationTitle)
+                                .foregroundStyle(.textPrimary)
                             Spacer()
                         }
                         HStack() {
                             Text("To get started, get your account.")
                                 .font(.system(size: 14, weight: .light))
-                                .foregroundStyle(.authenticationTitle2)
+                                .foregroundStyle(.textSecondary)
                             Spacer()
                         }
                     }
                     
-                    VStack(spacing: 12) {
+                    VStack(spacing: 14) {
                         TextFieldEmail(textFieldEmail: $textFieldEmail)
-                        TextFieldPassword(textFieldPassword: $textFieldPassword)
+                        PasswordCheckedField(textFieldPassword: $textFieldPassword)
                     }
                     
+                    
+                        
                     
                     AuthenticationButton(title: "Sign up") {
                         authenticationViewModel.createNewUser(email: textFieldEmail, password: textFieldPassword)
@@ -79,7 +80,68 @@ struct RegistrerView: View {
     RegistrerView(authenticationViewModel: AuthenticationViewModel())
 }
 
-struct AuthenticatioMessage {
+struct PasswordCheckedField : View {
+    @Binding var textFieldPassword: String
     
+    @State var checkMinChars: Bool = false
+    @State var checkLetter: Bool = false
+    @State var checPunctuacion: Bool = false
+    @State var checkNumber: Bool = false
+    @State var showPaswword: Bool = false
     
+//    var profressColor: Color {
+//        let containsLetters = textFieldPassword.rangeOfCharacter(from: .letters) != nil
+//        let containsNumbers = textFieldPassword.rangeOfCharacter(from: .decimalDigits) != nil
+//        let containsPunctuation = textFieldPassword.rangeOfCharacter(from: CharacterSet(charactersIn: "!@#%^&.")) != nil
+//        
+//        if containsLetters && containsNumbers && containsPunctuation && textFieldPassword.count >= 8 {
+//            return Color.green
+//        } else if containsLetters && !containsNumbers && !containsPunctuation {
+//            return Color.red
+//        } else if containsNumbers && !containsLetters && !containsPunctuation {
+//            return Color.red
+//        } else if containsLetters && containsNumbers && !containsPunctuation {
+//            return Color.yellow
+//        } else if containsLetters && containsNumbers && containsPunctuation {
+//            return Color.blue
+//        } else {
+//            return .gray
+//        }
+//    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            TextFieldPassword(textFieldPassword: $textFieldPassword)
+                .onChange(of: textFieldPassword) { oldValue, newValue in
+                    checkMinChars = newValue .count > 8
+                    checkLetter = newValue.rangeOfCharacter(from: .letters) != nil
+                    checkNumber = newValue.rangeOfCharacter(from: .decimalDigits) != nil
+                    checPunctuacion = newValue.rangeOfCharacter(from: CharacterSet(charactersIn: "!@#%^&.")) != nil
+                }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                CheckText(text: "Minimum 8 characters", check: $checkMinChars)
+                CheckText(text: "At least one letter", check: $checkLetter)
+                CheckText(text: "(!@#%^&.)", check: $checPunctuacion)
+                CheckText(text: "Number", check: $checkNumber)
+            }
+        }
+        
+        
+    }
+}
+
+
+struct CheckText: View {
+    let text: String
+    @Binding var check: Bool
+    var body: some View {
+        HStack {
+            Image(systemName: check ? "checkmark.circle.fill" : "circle")
+                .contentTransition(.symbolEffect)
+                .foregroundStyle(check ? .textSecondary : .textTerciary)
+            Text(text).font(.system(size: 14))
+        }
+        .foregroundColor(check ? .textSecondary : .textTerciary)
+    }
 }

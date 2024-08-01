@@ -18,7 +18,7 @@ struct TextFieldEmail: View {
                 TextField(text: $textFieldEmail) {
                     Text("Enter your email")
                         .font(.system(size: 14, weight: .thin))
-                        .foregroundStyle(.authenticationTextField)
+                        .foregroundStyle(.textFieldPlaceholder)
                 }
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
@@ -31,14 +31,14 @@ struct TextFieldEmail: View {
                     
                     HStack {
                         Rectangle()
-                            .fill(.authenticationRectangleDisabled)
+                            .fill(.textFieldRectangleNotFocused)
                             .frame(width: 330, alignment: .leading)
                         Spacer()
                     }
                     
                     HStack {
                         Rectangle()
-                            .fill(isEmailFieldFocused ? .authenticationRectangleEnabled : .clear)
+                            .fill(isEmailFieldFocused ? .textFieldRectangleFocused : .clear)
                         
                             .frame(width: isEmailFieldFocused ? 330 : 0, alignment: .leading)
                             .animation(.easeInOut(duration: 0.5), value: isEmailFieldFocused)

@@ -10,10 +10,12 @@ import FirebaseAuth
 
 @MainActor
 final class UserProfileViewModel: ObservableObject {
-    @Published var user: UserModel?
+    @Published var user: UserModel
     @Published var errorMessage: String?
     @Published var showAlert: Bool = false
+    @Published var profileImage: UIImage?
     
+    @Published var convertedBooks: [UserBookModel] = []
     @Published var wantToReadBooks: [UserBookModel] = []
     @Published var readBooks: [UserBookModel] = []
     @Published var currentlyReadingBooks: [UserBookModel] = []
@@ -24,11 +26,13 @@ final class UserProfileViewModel: ObservableObject {
     private let authenticationRepository: AuthenticationRepository
     private let googleApiViewRepository: GoogleApiRepository
     
+    
     init(
         userProfileRepository: UserProfileRepository = UserProfileRepository(),
         authenticationRepository: AuthenticationRepository = AuthenticationRepository(),
         googleApiViewRepository: GoogleApiRepository = GoogleApiRepository()
     ) {
+        self.user = UserModel()
         self.userProfileRepository = userProfileRepository
         self.authenticationRepository = authenticationRepository
         self.googleApiViewRepository = googleApiViewRepository
@@ -50,18 +54,18 @@ final class UserProfileViewModel: ObservableObject {
     
     /// Obtiene los datos del usuario desde Firestore y los carga en el usuario
     func getUserDetails() async {
-        guard let currentUser = user else { return }
         
         do {
-            let userModel = try await userProfileRepository.getUserDocument(user: currentUser)
+            let userModel = try await userProfileRepository.getUserDocument(user: user)
             self.user = userModel
+            await loadProfileImage()
             categorizeBooks(books: userModel.books)
             
         } catch {
             
             do {
-                try await userProfileRepository.createUserDocument(user: currentUser)
-                let userModel = try await userProfileRepository.getUserDocument(user: currentUser)
+                try await userProfileRepository.createUserDocument(user: user)
+                let userModel = try await userProfileRepository.getUserDocument(user: user)
                 self.user = userModel
                 categorizeBooks(books: userModel.books)
                 
@@ -76,10 +80,8 @@ final class UserProfileViewModel: ObservableObject {
     /// Actualiza una propiedad del perfil del usuario en la base de datos y actualiza los datos del usuario
     func updateUserProfileProperty(property: UserProfileProperty) {
         Task {
-            guard let currentUser = user else { return }
-            
             do {
-                try await userProfileRepository.updateUserProfileProperty(user: currentUser, property: property)
+                try await userProfileRepository.updateUserProfileProperty(user: user, property: property)
                 await getUserDetails()
             } catch {
                 self.errorMessage = "Failed to update profile property"
@@ -89,12 +91,33 @@ final class UserProfileViewModel: ObservableObject {
     }
     
     
+    /// Carga la imagen del usuariio
+    func loadProfileImage() async {
+        guard let imageUrlString = user.photoURL else {
+            return
+        }
+        print(imageUrlString)
+        let highResolutionUrlString = imageUrlString.replacingOccurrences(of: "s96-c", with: "s256-c")
+        
+        guard let imageUrl = URL(string: highResolutionUrlString) else {
+            return
+        }
+        print(highResolutionUrlString)
+        do {
+            let (data, _) = try await URLSession.shared.data(from: imageUrl)
+            if let uiImage = UIImage(data: data) {
+                self.profileImage = uiImage
+            }
+        } catch {
+            print("Error al descargar la imagen: \(error)")
+        }
+    }
+    
+    
     /// Añade un libro a su base de datos
-    func addBook(googleBook: GoogleBookModel, status: BookStatus) {
+    func addBook(userBook: UserBookModel, status: BookStatus) {
         Task {
-            guard var currentUser = user else { return }
-            
-            let userBook = convertToUserBookModel(from: googleBook, with: status)
+            var currentUser = user
             
             if let index = currentUser.books.firstIndex(where: { $0.id == userBook.id }) {
                 currentUser.books[index].bookStatus = status
@@ -117,11 +140,7 @@ final class UserProfileViewModel: ObservableObject {
     /// Elimina un libro de su base de datos
     func removeBook(bookID: String) {
         Task {
-            guard var currentUser = user else {
-                self.errorMessage = "User not logged in"
-                self.showAlert = true
-                return
-            }
+            var currentUser = user
             
             guard let index = currentUser.books.firstIndex(where: { $0.id == bookID}) else {
                 self.errorMessage = "Book not found in user's collection."
@@ -144,20 +163,62 @@ final class UserProfileViewModel: ObservableObject {
         }
     }
     
+    /// Método para comprobar el estado de un libro
+    func getBookStatus(for googleBook: UserBookModel) -> BookStatus {
+        // Buscar en los libros que el usuario quiere leer
+        if let book = wantToReadBooks.first(where: { $0.id == googleBook.id }) {
+            return book.bookStatus
+        }
+        
+        // Buscar en los libros que el usuario ha leído
+        if let book = readBooks.first(where: { $0.id == googleBook.id }) {
+            return book.bookStatus
+        }
+        
+        // Buscar en los libros que el usuario está leyendo actualmente
+        if let book = currentlyReadingBooks.first(where: { $0.id == googleBook.id }) {
+            return book.bookStatus
+        }
+        
+        // Si el libro no se encuentra, devolver .unkenow
+        return .unkenow
+    }
+    
+    /// Método para buscar libros por consulta y actualizar convertedBooks
+        func searchBooks(query: String) async {
+            do {
+                // Llamar al método de búsqueda en GoogleApiViewModel
+                let userBooks = try await googleApiViewRepository.searchBooks(query: query)
+                // Actualizar convertedBooks con los resultados convertidos
+                self.convertedBooks = userBooks
+            } catch {
+                self.errorMessage = "Error al buscar libros: \(error.localizedDescription)"
+                self.showAlert = true
+            }
+        }
+    
+    /// Convierte un array de GoogleBookModel a un array de UserBookModel
+    func convertBooksArray(from googleBooks: [GoogleBookModel], with status: BookStatus) -> [UserBookModel] {
+        return googleBooks.map { googleBook in
+            convertToUserBookModel(from: googleBook, with: status)
+        }
+    }
+    
     
     /// Convierte GoogleBookModel a UserBookModel
     private func convertToUserBookModel(from googleBook: GoogleBookModel, with status: BookStatus) -> UserBookModel {
         return UserBookModel(
             id: googleBook.id,
             title: googleBook.volumeInfo.title,
-            authors: googleBook.volumeInfo.authors ?? ["No Author found"],
-            publishedDate: googleBook.volumeInfo.publishedDate ?? "No Date",
-            description: googleBook.volumeInfo.description ?? "No Description available",
-            pagesRead: 0,  // Inicialmente 0, puedes ajustar esto según sea necesario
+            authors: googleBook.volumeInfo.authors,
+            publishedDate: googleBook.volumeInfo.publishedDate,
+            description: googleBook.volumeInfo.description,
+            pagesRead: 0,
             pageCount: googleBook.volumeInfo.pageCount,
-            categories: googleBook.volumeInfo.categories ?? ["No Category"],
+            categories: googleBook.volumeInfo.categories,
             averageRating: googleBook.volumeInfo.averageRating,
-            myRating: 0.0,  // Inicialmente 0.0, puedes ajustar esto según sea necesario
+            myRating: 0.0, 
+            language: googleBook.volumeInfo.language,
             imageLinks: googleBook.volumeInfo.imageLinks,
             bookStatus: status,
             creationDate: Date()
@@ -183,12 +244,11 @@ final class UserProfileViewModel: ObservableObject {
     /// Elimina el perfil del usuario
     func deleteUserProfile() {
         Task {
-            guard let currentUser = user else { return }
             
             do {
-                try await userProfileRepository.deleteUserDocument(user: currentUser)
+                try await userProfileRepository.deleteUserDocument(user: user)
                 try authenticationRepository.logout()
-                self.user = nil
+                self.user = UserModel()
                 self.errorMessage = "User profile deleted."
                 self.showAlert = true
             } catch {
@@ -221,7 +281,7 @@ final class UserProfileViewModel: ObservableObject {
         Task {
             do {
                 try authenticationRepository.logout()
-                self.user = nil
+                self.user = UserModel()
                 shouldDismiss = true
             } catch {
                 self.errorMessage = "Error sign out: \(error.localizedDescription)"
@@ -232,90 +292,3 @@ final class UserProfileViewModel: ObservableObject {
     
     
 }
-
-////    // Carga detalles adicionales del usuario desde la base de datos
-////    func getUserDetails() async {
-////        guard let currentUser = user else {
-////            print("No user information available")
-////            return
-////        }
-////        do {
-////            if let userFromBD = try await userProfileRepository.getBSUser(authUser: currentUser) {
-////                self.user = userFromBD
-////            } else {
-////                // Si el usuario no existe en la base de datos, créalo
-////                try await userProfileRepository.createBDUser(authUser: currentUser)
-////                let newUserFromBD = try await userProfileRepository.getBSUser(authUser: currentUser)
-////                self.user = newUserFromBD
-////                print("Created new user in database.")
-////            }
-////        } catch {
-////            self.errorMessage = error.localizedDescription
-////            self.showAlert = true
-////        }
-////    }
-//
-//
-//    // Añade un libro a una lista específica
-//    func addBook(book: GoogleBookModel, to listType: BookListType) {
-//        Task {
-//            do {
-//                guard var currentUser = user else { return }
-//                var updateBooks = getBooks(for: listType, from: currentUser)
-//                updateBooks.append(book.id)
-//
-//                try await userProfileRepository.updateBookList(authUser: currentUser, books: updateBooks, listType: listType)
-//                updateLocalUserBookList(updateBooks, for: listType, in: &currentUser)
-//                self.user = currentUser
-//
-//            } catch {
-//                self.errorMessage = error.localizedDescription
-//                self.showAlert = true
-//            }
-//        }
-//    }
-//
-//    // Elimina un libro de una lista específica
-//    func removeBook(book: GoogleBookModel, from listType: BookListType) {
-//        Task {
-//            do {
-//                guard var currentUser = user else { return }
-//                var updateBooks = getBooks(for: listType, from: currentUser)
-//                updateBooks.removeAll { $0 == book.id }
-//
-//                try await userProfileRepository.updateBookList(authUser: currentUser, books: updateBooks, listType: listType)
-//                updateLocalUserBookList(updateBooks, for: listType, in: &currentUser)
-//                self.user = currentUser
-//
-//            } catch {
-//                self.errorMessage = error.localizedDescription
-//                self.showAlert = true
-//            }
-//        }
-//    }
-//
-////    // Obtiene la lista de libros actual para un tipo de lista dado
-////    private func getBooks(for listType: BookListType, from user: UserModel) -> [String] {
-////        switch listType {
-////        case .wantToRead:
-////            return user.wantToRead
-////        case .read:
-////            return user.read
-////        case .currentlyReading:
-////            return user.currentlyReading
-////        }
-////    }
-//
-//    // Actualiza el estado local del usuario con la lista de libros modificada
-//    private func updateLocalUserBookList(_ books: [String], for listType: BookListType, in user: inout UserModel) {
-//        switch listType {
-//        case .wantToRead:
-//            user.wantToRead = books
-//        case .read:
-//            user.read = books
-//        case .currentlyReading:
-//            user.currentlyReading = books
-//        }
-//    }
-//}
-

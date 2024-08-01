@@ -16,7 +16,7 @@ struct AuthenticationButton: View {
             Text(title).foregroundStyle(.textBlancoNegro)
                 .frame(maxWidth: .infinity)
                 .frame(height: 40)
-                .background(.registrerButton, in: .rect(cornerRadius: 10))
+                .background(.buttonAuthentication, in: .rect(cornerRadius: 10))
         })
     }
 }

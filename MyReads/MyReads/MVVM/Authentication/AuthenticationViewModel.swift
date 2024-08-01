@@ -18,7 +18,6 @@ import GoogleSignInSwift
 final class AuthenticationViewModel: ObservableObject {
     @Published var user: UserModel?
     @Published var messageError: String?
-    @Published var linkedAccounts: [LinkedAccounts] = []
     @Published var showAlert: Bool = false
     @Published var messageAlert: String?
     @Published var shouldDismiss: Bool = false
@@ -170,23 +169,6 @@ final class AuthenticationViewModel: ObservableObject {
         }
         
     }
-    
-    
-    // Obtiene los proveedores de autenticacion vinculados al usuario actual
-    func getCurrentProvider() {
-        linkedAccounts = authenticationRepository.getCurrentProvider()
-    }
-    
-    
-    // Verifica si la cuenta de correo y contraseña esta vinculada
-    func isEmailAndPasswordLinked() -> Bool {
-        linkedAccounts.contains(where: { $0.rawValue == "password"})
-    }
-    
-    
-    // Verifica si la cuenta de Google esta vinculada
-    func isGoogleLinked() -> Bool {
-        linkedAccounts.contains(where: { $0.rawValue == "google.com"})
-    }
+
     
 }

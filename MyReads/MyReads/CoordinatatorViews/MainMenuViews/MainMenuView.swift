@@ -9,36 +9,36 @@ import SwiftUI
 
 struct MainMenuView: View {
     @ObservedObject var userProfileViewModel: UserProfileViewModel
-    @StateObject var googleApiViewModel = GoogleApiViewModel()
-    @State private var selectedTab = 0
+    @ObservedObject var googleApiViewModel: GoogleApiViewModel
+    @StateObject private var keyboardManager = KeyboardManager()
+    @State var selectedView: TabIcon = .home
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
-                .tabItem {
-                    Label("Home", systemImage: "house")
-                }
-                .tag(0)
-                
-            MyBooksView()
-                .tabItem {
-                    Label("Profile", systemImage: "book")
-                }
-                .tag(1)
+        ZStack {
+            Color.backgroundGeneral.ignoresSafeArea()
             
-            ProfileImageView()
-                .tabItem {
-                    Label("Profile", systemImage: "person")
+            VStack {
+                switch selectedView {
+                case .home:
+                    HomeView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
+                case .book:
+                    MyBooksView()
+                case .person:
+                    UserProfileView(userProfileViewModel: userProfileViewModel)
+                        
                 }
-                .tag(2)
-            
-            UserProfileView(userProfileViewModel: userProfileViewModel)
-                .tabItem {
-                    Label("Profile", systemImage: "person")
-                }
-                .tag(3)
-            
+
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .animation(nil, value: selectedView)
+            .transition(.identity)
+            .overlay(alignment: .bottom) {
+                CustomNav(selectedTab: $selectedView)
+                    .padding(.bottom, 20).background(.backgroundGeneral.opacity(0.90))
+                    
+            }
         }
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 

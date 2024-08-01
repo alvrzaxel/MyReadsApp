@@ -22,18 +22,18 @@ struct SignInView: View {
                 HStack() {
                     Text("Welcome Back!")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(.authenticationTitle)
+                        .foregroundStyle(.textPrimary)
                     Spacer()
                 }
                 HStack() {
                     Text("To get started, sign in to your account.")
                         .font(.system(size: 14, weight: .light))
-                        .foregroundStyle(.authenticationTitle2)
+                        .foregroundStyle(.textSecondary)
                     Spacer()
                 }
             }
             
-            VStack(spacing: 12) {
+            VStack(spacing: 14) {
                 TextFieldEmail(textFieldEmail: $textFieldEmail)
                 
                 TextFieldPassword(textFieldPassword: $textFieldPassword)
@@ -45,6 +45,18 @@ struct SignInView: View {
                 authenticationViewModel.login(email: textFieldEmail, password: textFieldPassword)
             }
             
+            if authenticationViewModel.showAlert,
+                let message = authenticationViewModel.messageError {
+                
+                Text(message)
+                    .font(.system(size: 10, weight: .ultraLight))
+                    .foregroundStyle(.red)
+                    .padding(.top, 10)
+            }
+            
+        }
+        .onDisappear {
+            authenticationViewModel.cleanMessageError()
         }
     }
 }
@@ -72,7 +84,7 @@ struct ButtonForgetPassword: View {
                     .padding(.trailing, 10)
                     .padding(.top, 4)
                     .font(.system(size: 10))
-                    .foregroundStyle(.authenticationTitle2)
+                    .foregroundStyle(.textTerciary)
             }
         }
     }

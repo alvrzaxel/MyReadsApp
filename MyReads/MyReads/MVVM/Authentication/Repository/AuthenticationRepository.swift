@@ -57,9 +57,4 @@ final class AuthenticationRepository {
     func deleteAcount() async throws {
         try await authenticationFirebaseDatasource.deleteAccount()
     }
-    
-    // Obtiene los proveedores de autenticacion del usuario actualmente autenticado
-    func getCurrentProvider() -> [LinkedAccounts] {
-        authenticationFirebaseDatasource.currentProvider()
-    }
 }

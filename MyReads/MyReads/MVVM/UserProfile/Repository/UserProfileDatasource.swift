@@ -12,6 +12,7 @@ enum UserProfileProperty {
     case displayName(String)
     case email(String)
     case photoURL(String?)
+    case yearlyReadingGoal(Int)
 }
 
 final class UserProfileDatasource {
@@ -41,6 +42,7 @@ final class UserProfileDatasource {
             "photoURL": user.photoURL ?? "",
             "providerID": user.providerID,
             "creationDate": Timestamp(date: user.creationDate),
+            "yearlyReadingGoal": user.yearlyReadingGoal,
             "books": booksString // Codifica el array de libros a JSON
         ]
         
@@ -77,6 +79,7 @@ final class UserProfileDatasource {
         let providerID = data["providerID"] as? String ?? "No Provider"
         let creationDateTimestamp = data["creationDate"] as? Timestamp
         let creationDate = creationDateTimestamp?.dateValue() ?? Date()
+        let yearlyReadingGoal = data["yearlyReadingGoal"] as? Int ?? 1
         
         let books: [UserBookModel] = try await getUserBooks(user: user)
         
@@ -89,7 +92,8 @@ final class UserProfileDatasource {
             photoURL: photoURL,
             providerID: providerID,
             creationDate: creationDate,
-            books: books
+            books: books,
+            yearlyReadingGoal: yearlyReadingGoal
         )
         
         return userModel
@@ -129,6 +133,8 @@ final class UserProfileDatasource {
             dataToUpdate["email"] = newEmail
         case .photoURL(let newPhotoURl):
             dataToUpdate["photoURL"] = newPhotoURl
+        case .yearlyReadingGoal(let newGoal):
+            dataToUpdate["yearlyReadingGoal"] = newGoal
         }
         
         try await userRef.updateData(dataToUpdate)

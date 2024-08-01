@@ -9,8 +9,10 @@ import Foundation
 
 @MainActor
 class GoogleApiViewModel: ObservableObject, Observable {
-    @Published var books: [GoogleBookModel] = []
-    @Published var selectedBook: GoogleBookModel?
+    @Published var booksResultSearch: [UserBookModel]? = nil
+    @Published var selectedBook: UserBookModel?
+    @Published var booksByCategory: [UserBookModel] = []
+    
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     
@@ -18,114 +20,88 @@ class GoogleApiViewModel: ObservableObject, Observable {
     
     init(googleApiRepository: GoogleApiRepository = GoogleApiRepository()) {
         self.googleApiRepository = googleApiRepository
+        //        Task {
+        //            await self.loadBooksForCategory(category: "Fiction")
+        //        }
     }
     
-    // Busca libros usando una consulta generica
+    /// Busca libros usando una consulta genérica y almacena en booksResultSearch
     func searchBooks(query: String) async {
         isLoading = true
-        Task {
-            do {
-                let fetchedBooks = try await googleApiRepository.searchBooks(query: query)
-                self.books = fetchedBooks
-                self.errorMessage = nil
-            } catch {
-                self.errorMessage = error.localizedDescription
-            }
-            isLoading = false
+        defer { isLoading = false }
+        
+        do {
+            // Llama al repositorio y actualiza booksResultSearch
+            let fetchedBooks = try await googleApiRepository.searchBooks(query: query)
+            self.booksResultSearch = fetchedBooks
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.booksResultSearch = nil
         }
     }
     
-    // Busca libros por su categoria
-    func searchBooks(ByCategory category: String) async {
+    /// Busca libros por su categoría  y almacena en booksByCategory
+    func searchBooks(byCategory category: String) async {
         isLoading = true
-        Task {
-            do {
-                let fetchedBooks = try await googleApiRepository.searchBooks(byCategory: category)
-                self.books = fetchedBooks
-                self.errorMessage = nil
-            } catch {
-                self.errorMessage = error.localizedDescription
-            }
-            isLoading = false
+        defer { isLoading = false }
+        
+        do {
+            // Llama al repositorio y actualiza booksByCategory
+            let fetchedBooks = try await googleApiRepository.searchBooks(byCategory: category)
+            self.booksByCategory = fetchedBooks
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.booksByCategory = []
         }
     }
     
-    // Busca libros por su autor
+    /// Busca libros por su autor y almacena en booksResultSearch
     func searchBooks(byAuthor author: String) async {
         isLoading = true
-        Task {
-            do {
-                let fetchedBooks = try await googleApiRepository.searchBooks(byAuthor: author)
-                self.books = fetchedBooks
-                self.errorMessage = nil
-            } catch {
-                self.errorMessage = error.localizedDescription
-            }
-            
-            isLoading = false
+        defer { isLoading = false }
+        
+        do {
+            // Llama al repositorio y actualiza booksResultSearch
+            let fetchedBooks = try await googleApiRepository.searchBooks(byAuthor: author)
+            self.booksResultSearch = fetchedBooks
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.booksResultSearch = nil
         }
     }
     
-    // busca un libro por su ID
+    /// Busca un libro por su ID y almacena en selectedBook
     func getBook(byID id: String) async {
         isLoading = true
-        Task {
-            do {
-                if let book = try await googleApiRepository.getBook(byID: id) {
-                    self.selectedBook = book
-                    self.errorMessage = nil
-                } else {
-                    self.errorMessage = "Book not found"
-                }
-            } catch {
-                self.errorMessage = error.localizedDescription
+        defer { isLoading = false }
+        
+        do {
+            if let book = try await googleApiRepository.getBook(byID: id) {
+                self.selectedBook = book
+            } else {
+                self.errorMessage = "Book not found"
+                self.selectedBook = nil
             }
-            isLoading = false
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.selectedBook = nil
         }
     }
+    
+    /// Busca libros por su categoría y actualiza booksByCategory
+    func loadBooksForCategory(category: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // Llama al repositorio y actualiza booksByCategory
+            let fetchedBooks = try await googleApiRepository.searchBooks(byCategory: category)
+            self.booksByCategory = fetchedBooks
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.booksByCategory = []
+        }
+    }
+    
+    
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-//    // Búsqueda genérica
-//    func searchBooks(query: String) async {
-//        do {
-//            let books = try await googleApiRepository.fetchBooks(query: query)
-//            self.books = books
-//        } catch {
-//            self.errorMessage = error.localizedDescription
-//        }
-//    }
-//    
-//    // Búsqueda de libro por ID
-//    func searchBookId(byId id: String) async {
-//        do {
-//            let book = try await googleApiRepository.fetchBook(byId: id)
-//            self.selectedBook = book
-//        } catch {
-//            self.errorMessage = error.localizedDescription
-//        }
-//    }
-//    
-//    // Búsqueda de libros por categoría
-//    func searchBooksCategory(byCategory category: String) async {
-//        do {
-//            let books = try await googleApiRepository.fetchBooks(byCategory: category)
-//            self.books = books
-//        } catch {
-//            self.errorMessage = error.localizedDescription
-//        }
-//    }
-//    
-//    // Obtener libros basados en una lista de IDs
-//    func fetchBooksByIds(ids: [String]) async throws -> [Book] {
-//        return try await googleApiRepository.fetchBooksByIds(ids: ids)
-//    }
-

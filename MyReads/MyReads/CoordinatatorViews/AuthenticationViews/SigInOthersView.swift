@@ -21,14 +21,14 @@ struct SigInOthersView: View {
                         .frame(height: 20)
                     Text("Sign in with Google")
                         .font(.system(size: 14, weight: .light))
-                        .foregroundStyle(.textNegroBlanco)
+                        .foregroundStyle(.textSecondary)
                 }
             }
             .frame(maxWidth: .infinity)
             .frame(height: 40)
-            .background(.textBlancoNegro)
+            .background(.backgroundButtonSignInOthers)
             .cornerRadius(10)
-            .shadow(color: .textNegroBlanco, radius: 1)
+            .shadow(color: .shadowButtonSignInOthers, radius: 1)
             
             Button(action: {
                 //TODO
@@ -39,16 +39,16 @@ struct SigInOthersView: View {
                         .scaledToFit()
                         .frame(height: 20)
                         .foregroundStyle(.textNegroBlanco)
-                    Text("Sign in with Google")
+                    Text("Sign in with Apple")
                         .font(.system(size: 14, weight: .light))
-                        .foregroundStyle(.textNegroBlanco)
+                        .foregroundStyle(.textSecondary)
                 }
             }
             .frame(maxWidth: .infinity)
             .frame(height: 40)
-            .background(.textBlancoNegro)
+            .background(.backgroundButtonSignInOthers)
             .cornerRadius(10)
-            .shadow(color: .textNegroBlanco, radius: 1)
+            .shadow(color: .shadowButtonSignInOthers, radius: 1)
         }
     }
 }

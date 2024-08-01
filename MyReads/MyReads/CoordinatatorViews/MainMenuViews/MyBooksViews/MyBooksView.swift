@@ -8,34 +8,42 @@
 import SwiftUI
 
 struct MyBooksView: View {
-    @State var show: Bool = false
+    
     var body: some View {
-        VStack {
-            Color.generalBackground.ignoresSafeArea()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .safeAreaInset(edge: .top) {
-            VStack(spacing: .zero) {
-                Image(.iconBar)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 35)
-                    .padding(.vertical, 10)
-                //CircleMagnifyingGlass()
+        ZStack {
+            Color.backgroundGeneral.ignoresSafeArea()
+            
+            VStack {
                 
             }
-            .background(.generalBackground.opacity(0.98))
-            
         }
+        .safeAreaInset(edge: .top) {
+            NavBarMyBooks()
+        }
+
+        
     }
 }
+
+
+struct NavBarMyBooks: View {
+    var body: some View {
+        VStack {
+            Image(.iconBar)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 30)
+                
+        }
+        .frame(maxWidth: .infinity, maxHeight: 50)
+        .padding(.bottom, 10)
+        .background(.backgroundGeneral.opacity(0.95))
+        
+        
+    }
+}
+
 
 #Preview {
     MyBooksView()
-}
-
-#Preview("Ligth") {
-    NavigationStack {
-        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
-    }
 }

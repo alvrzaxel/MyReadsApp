@@ -13,11 +13,9 @@ struct AuthenticationView: View {
     @State var showForgotView: Bool = false
     @State private var showSignUpView: Bool = false
     
-    
-    
     var body: some View {
         ZStack {
-            Color.authenticationBackground.ignoresSafeArea()
+            Color.backgroundGeneral.ignoresSafeArea()
             
             VStack {
                 Image(.imageAuthenticationView).resizable().frame(width: 200, height: 200)
@@ -26,9 +24,9 @@ struct AuthenticationView: View {
                 
                 HStack {
                     VStack { Divider() }
-                    Text("Or sign in with")
+                    Text("or")
                         .font(.system(size: 14, weight: .light))
-                        .foregroundStyle(.authenticationOrSign)
+                        .foregroundStyle(.textSecondary)
                     VStack { Divider() }
                 }.padding(.vertical, 35)
                 
@@ -64,11 +62,13 @@ struct DontHaveAccount: View {
             Button {
                 showSignUpView.toggle()
             } label: {
-                Text("Don't have an account? Sign up")
-                    .foregroundStyle(.authenticationNoAccount)
+                
+                Text("Don't have an account? ")
+                    .foregroundStyle(.textTerciary)
+                + Text("Sign up").fontWeight(.semibold)
+                    .foregroundStyle(.textSecondary)
             }
             .font(.system(size: 12, weight: .light))
-            .tint(.textNegroBlanco)
             .padding(.bottom, 2)
 
         }
@@ -78,7 +78,12 @@ struct DontHaveAccount: View {
 
 
 
-#Preview {
+#Preview("Ligth") {
     AuthenticationView(authenticationViewModel: AuthenticationViewModel())
-    
+        .preferredColorScheme(.light)
+}
+
+#Preview("Dark") {
+    AuthenticationView(authenticationViewModel: AuthenticationViewModel())
+        .preferredColorScheme(.dark)
 }

@@ -12,6 +12,32 @@ struct TextFieldPassword: View {
     @Binding var textFieldPassword: String
     @FocusState private var isPasswordFieldFocused: Bool
     
+    @State var checkMinChars: Bool = false
+    @State var checkLetter: Bool = false
+    @State var checPunctuacion: Bool = false
+    @State var checkNumber: Bool = false
+    @State var showPaswword: Bool = false
+    
+    var profressColor: Color {
+        let containsLetters = textFieldPassword.rangeOfCharacter(from: .letters) != nil
+        let containsNumbers = textFieldPassword.rangeOfCharacter(from: .decimalDigits) != nil
+        let containsPunctuation = textFieldPassword.rangeOfCharacter(from: CharacterSet(charactersIn: "!@#%^&.")) != nil
+        
+        if containsLetters && containsNumbers && containsPunctuation && textFieldPassword.count >= 8 {
+            return Color.green
+        } else if containsLetters && !containsNumbers && !containsPunctuation {
+            return Color.red
+        } else if containsNumbers && !containsLetters && !containsPunctuation {
+            return Color.red
+        } else if containsLetters && containsNumbers && !containsPunctuation {
+            return Color.yellow
+        } else if containsLetters && containsNumbers && containsPunctuation {
+            return Color.blue
+        } else {
+            return .gray
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             
@@ -21,7 +47,7 @@ struct TextFieldPassword: View {
                         SecureField(text: $textFieldPassword) {
                             Text("Password")
                                 .font(.system(size: 14, weight: .thin))
-                                .foregroundStyle(.authenticationTextField)
+                                .foregroundStyle(.textFieldPlaceholder)
                         }
                         .autocapitalization(.none)
                         .autocorrectionDisabled(true)
@@ -32,11 +58,17 @@ struct TextFieldPassword: View {
                         TextField(text: $textFieldPassword) {
                             Text("Password")
                                 .font(.system(size: 14, weight: .thin))
-                                .foregroundStyle(.authenticationTextField)
+                                .foregroundStyle(.textFieldPlaceholder)
                         }
                         .autocapitalization(.none)
                         .autocorrectionDisabled(true)
                         .focused($isPasswordFieldFocused)
+                        .onChange(of: textFieldPassword) { oldValue, newValue in
+                            withAnimation {
+                                checkMinChars = newValue .count > 8
+                                
+                            }
+                        }
                     }
                 }
                 
@@ -49,14 +81,15 @@ struct TextFieldPassword: View {
                 ZStack(alignment: .leading) {
                     HStack {
                         Rectangle()
-                            .fill(.authenticationRectangleDisabled)
+                            .fill(.textFieldRectangleNotFocused
+                            )
                             .frame(width: 330, alignment: .leading)
                         Spacer()
                     }
                     
                     HStack {
                         Rectangle()
-                            .fill(isPasswordFieldFocused ? .authenticationRectangleEnabled : .clear)
+                            .fill(isPasswordFieldFocused ? .textFieldRectangleFocused : .clear)
                         
                             .frame(width: isPasswordFieldFocused ? 330 : 0, alignment: .leading)
                             .animation(.easeInOut(duration: 0.5), value: isPasswordFieldFocused)
@@ -89,10 +122,10 @@ struct SecuredPasswordButton: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)
-                    .foregroundStyle(.authenticationEye)
+                    .foregroundStyle(isSecured ? .textFieldPlaceholder : .textTerciary)
                 
             }
-            .tint(.textNegroBlanco.opacity(0.5))
+            //.tint(.textNegroBlanco.opacity(0.5))
             .padding(.trailing, 20)
         }
     }

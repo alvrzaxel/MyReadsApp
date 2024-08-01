@@ -14,20 +14,20 @@ struct ForgotView: View {
     
     var body: some View {
         ZStack {
-            Color.authenticationBackground.ignoresSafeArea()
+            Color.backgroundGeneral.ignoresSafeArea()
             
             VStack(spacing: 25) {
                 VStack(spacing: 10) {
                     HStack() {
                         Text("Forgot you password?")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(.authenticationTitle)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.textPrimary)
                         Spacer()
                     }
                     HStack() {
                         Text("Enter you email address and we will share a link to create a newpassword.")
-                            .font(.system(size: 14, weight: .light))
-                            .foregroundStyle(.authenticationTitle2)
+                            .font(.system(size: 12, weight: .light))
+                            .foregroundStyle(.textSecondary)
                         Spacer()
                     }
                 }
@@ -59,6 +59,8 @@ struct ForgotView: View {
         .onDisappear { authenticationViewModel.cleanAnyMessage() }
     }
 }
+
+
 
 #Preview {
     ForgotView(authenticationViewModel: AuthenticationViewModel())

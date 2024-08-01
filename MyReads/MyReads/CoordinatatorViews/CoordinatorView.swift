@@ -10,23 +10,25 @@ import SwiftUI
 struct CoordinatorView: View {
     @StateObject var authenticationViewModel = AuthenticationViewModel ()
     @StateObject var userProfileViewModel = UserProfileViewModel()
+    @StateObject var googleApiViewModel = GoogleApiViewModel()
     
     var body: some View {
         Group {
             if authenticationViewModel.user != nil {
-                MainMenuView(userProfileViewModel: userProfileViewModel)
+                MainMenuView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
                     .environmentObject(authenticationViewModel)
                     .onAppear {
-                        print("Se cargan los datos del usuario")
                         userProfileViewModel.loadCurrentUser()
+                        print("Se cargan los datos del usuario")
                     }
-                    
-                    
+                
             } else {
                 AuthenticationView(authenticationViewModel: authenticationViewModel)
             }
         }
-        
+        .onAppear {
+            authenticationViewModel.getCurrentUser()
+        }
     }
 }
 
