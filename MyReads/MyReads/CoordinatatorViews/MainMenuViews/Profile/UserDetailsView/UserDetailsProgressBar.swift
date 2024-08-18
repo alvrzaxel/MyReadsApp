@@ -30,7 +30,7 @@ struct UserDetailsProgressBar: View {
                     .font(.system(size: 12))
                 
                 ProgressView(value: min(Double(booksReadThisYear), Double(userProfileViewModel.user.yearlyReadingGoal)), total: Double(userProfileViewModel.user.yearlyReadingGoal))
-                    .tint(.customOrange3)
+                    .tint(.colorAccentOrange)
                 
                 Text("\(booksReadThisYear)/\(userProfileViewModel.user.yearlyReadingGoal)")
                     .font(.system(size: 12))

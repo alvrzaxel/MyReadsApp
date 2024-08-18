@@ -7,13 +7,14 @@
 
 import Foundation
 
-struct UserBookModel: Codable {
+struct UserBookModel: Codable, Identifiable {
+    
     let id: String
     let title: String
     let authors: [String]?
     let publishedDate: String?
     let description: String?
-    let pagesRead: Int
+    var pagesRead: Int
     let pageCount: Int?
     let categories: [String]?
     let averageRating: Double?
@@ -23,11 +24,9 @@ struct UserBookModel: Codable {
     var bookStatus: BookStatus
     var creationDate: Date = Date()
     
-
-    
 }
 
-enum BookStatus: String, Codable {
+enum BookStatus: String, Codable, CaseIterable {
     case wantToRead = "wantToRead"
     case read = "read"
     case currentlyReading = "currentlyReading"

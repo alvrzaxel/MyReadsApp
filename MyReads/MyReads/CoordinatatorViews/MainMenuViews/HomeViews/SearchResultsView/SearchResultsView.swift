@@ -20,14 +20,17 @@ struct SearchResultsView: View {
                     Spacer()
                 } else {
                     ScrollView {
-                        ForEach(bookSearchResults, id: \.id) { book in
-                            VStack {
-                                BookInList(userProfileViewModel: userProfileViewModel, book: book)
+                        VStack(spacing: 16) {
+                            ForEach(bookSearchResults, id: \.id) { book in
+                                VStack {
+                                    BookInList(userProfileViewModel: userProfileViewModel, book: book)
+                                    
+                                }
+                                .padding(5)
                                 
-                                Divider()
                             }
-                            .padding(5)
                         }
+                        .padding(.bottom, 90)
                     }
                     .frame(maxWidth: .infinity)
                     .scrollIndicators(.never)
@@ -35,6 +38,7 @@ struct SearchResultsView: View {
                 }
             }
         }
+
         
     }
 }

@@ -6,9 +6,6 @@
 //
 
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
-import FirebaseFirestoreSwift
 
 final class UserProfileRepository {
     
@@ -48,5 +45,10 @@ final class UserProfileRepository {
     // Elimina el documento del usuario basado en su UID
     func deleteUserDocument(user: UserModel) async throws {
         try await userProfileDataSource.deleteUserDocument(user: user)
+    }
+    
+    // Método para subir una imagen de perfil y actualizar la URL en la base de datos
+    func uploadProfileImage(user: UserModel, imageData: Data) async throws {
+        try await userProfileDataSource.uploadProfileImage(user: user, imageData: imageData)
     }
 }

@@ -12,19 +12,22 @@ import SwiftUI
 struct MyBooksView: View {
     @Binding  var showChangeTheme: Bool
     @ObservedObject var userProfileViewModel: UserProfileViewModel
-    @State private var selectedList: BookList = .wantToRead
+    @State var selectedList: BookList = .wantToRead
     
     var body: some View {
         ZStack {
             Color.colorbackground1.ignoresSafeArea()
             
-            VStack(spacing: 30) {
-                if shouldShowCurrentlyReadingView() {
+            VStack(spacing: 20) {
+                if userProfileViewModel.shouldShowCurrentlyReadingView() {
                     CurrentlyView(userProfileViewModel: userProfileViewModel)
                 }
                 
                 MyBooksPickerView(userProfileViewModel: userProfileViewModel, selectedList: $selectedList)
             }
+            
+            
+            Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .safeAreaInset(edge: .top) {
@@ -32,10 +35,7 @@ struct MyBooksView: View {
         }
     }
     
-    // Determina si se debe mostrar CurrentlyReadingView
-    private func shouldShowCurrentlyReadingView() -> Bool {
-        return userProfileViewModel.user.books.contains(where: { $0.bookStatus == .currentlyReading })
-    }
+    
 }
 
 

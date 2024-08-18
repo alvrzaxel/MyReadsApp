@@ -20,13 +20,16 @@ final class AuthenticationFirebaseDatasource {
             return nil
         }
         
+        let providerIDString = user.providerData.first?.providerID ?? "unknown"
+        let providerID = ProviderID(rawValue: providerIDString)
+        
         return UserModel(
             uid: user.uid,
             displayName: user.displayName,
             email: user.email,
             emailVerified: user.isEmailVerified,
             photoURL: user.photoURL?.absoluteString,
-            providerID: user.providerData.first?.providerID,
+            providerID: providerID,
             creationDate: user.metadata.creationDate
         )
     }
@@ -36,13 +39,16 @@ final class AuthenticationFirebaseDatasource {
         let authDataResult = try await Auth.auth().createUser(withEmail: email, password: password)
         
         let user = authDataResult.user
+        let providerIDString = user.providerData.first?.providerID ?? "unknown"
+        let providerID = ProviderID(rawValue: providerIDString)
+        
         return UserModel(
             uid: user.uid,
             displayName: user.displayName,
             email: user.email,
             emailVerified: user.isEmailVerified,
             photoURL: user.photoURL?.absoluteString,
-            providerID: user.providerData.first?.providerID,
+            providerID: providerID,
             creationDate: user.metadata.creationDate
         )
     }
@@ -52,13 +58,16 @@ final class AuthenticationFirebaseDatasource {
         let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
         
         let user = authDataResult.user
+        let providerIDString = user.providerData.first?.providerID ?? "unknown"
+        let providerID = ProviderID(rawValue: providerIDString)
+        
         return UserModel(
             uid: user.uid,
             displayName: user.displayName,
             email: user.email,
             emailVerified: user.isEmailVerified,
             photoURL: user.photoURL?.absoluteString,
-            providerID: user.providerData.first?.providerID,
+            providerID: providerID,
             creationDate: user.metadata.creationDate
         )
     }
@@ -67,7 +76,10 @@ final class AuthenticationFirebaseDatasource {
     func loginWithGoogle() async throws -> UserModel {
         let credential = try await googleAuthentication.signInWithGoogle()
         let authDataResult = try await Auth.auth().signIn(with: credential)
+        
         let user = authDataResult.user
+        let providerIDString = user.providerData.first?.providerID ?? "unknown"
+        let providerID = ProviderID(rawValue: providerIDString)
         
         return UserModel(
             uid: user.uid,
@@ -75,7 +87,7 @@ final class AuthenticationFirebaseDatasource {
             email: user.email,
             emailVerified: user.isEmailVerified,
             photoURL: user.photoURL?.absoluteString,
-            providerID: user.providerData.first?.providerID,
+            providerID: providerID,
             creationDate: user.metadata.creationDate
         )
     }

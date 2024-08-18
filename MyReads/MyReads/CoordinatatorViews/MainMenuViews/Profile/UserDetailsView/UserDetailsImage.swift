@@ -10,7 +10,6 @@ import SwiftUI
 struct UserDetailsImage: View {
     @Binding var profileImage: UIImage?
     
-    
     var body: some View {
         if let profileImage = profileImage {
             Image(uiImage: profileImage).resizable().scaledToFill()
@@ -22,8 +21,6 @@ struct UserDetailsImage: View {
                 .resizable()
                 .frame(width: 110, height: 110)
                 .foregroundStyle(.gray)
-            
-            
         }
     }
 }

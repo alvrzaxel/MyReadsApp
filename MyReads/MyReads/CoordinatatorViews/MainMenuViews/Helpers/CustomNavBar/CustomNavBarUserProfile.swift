@@ -22,9 +22,9 @@ struct CustomNavBarUserProfile: View {
             }
                 
         }
-        .frame(maxWidth: .infinity, maxHeight: 50)
+        .frame(maxWidth: .infinity, maxHeight: 40)
         .padding(.bottom, 10)
-        .background(.backgroundGeneral.opacity(0.95))
+        .background(.colorbackground1.opacity(0.98))
         .overlay(alignment: .trailing) {
             Button(action: {
                 withAnimation {

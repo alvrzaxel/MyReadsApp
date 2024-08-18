@@ -15,45 +15,32 @@ struct CurrentlyBookDetails: View {
     
     var body: some View {
         VStack {
-            HStack(spacing: 16) {
+            HStack(alignment: .center, spacing: 16) {
                 Button(action: {
                     showBookDetails.toggle()
                 }, label: {
                     VStack {
-                        if let imageUrl = book.imageLinks?.thumbnail {
-                            AsyncImageView(urlString: imageUrl)
-                                .scaledToFit()
-                                .frame(width: 70, height: 120)
-                                .clipped()
-                        } else {
-                            Rectangle()
-                                .scaledToFill()
-                                .frame(maxWidth: 70, maxHeight: 120)
-                                .clipped()
-                                .cornerRadius(10)
-                                .foregroundStyle(.textQuaternary).opacity(0.5)
-                                .overlay {
-                                    Text("No image available").foregroundStyle(.colortext4).opacity(0.5)
-                                }
-                        }
+                        
+                        CustomCoverImage(imageUrl: book.imageLinks?.thumbnail)
+                        
                     }
                 })
                 
-                
                 VStack(alignment: .leading) {
+                   
                     Text(book.title)
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.white)
+                        .lineLimit(1)
                     
                     CurrentlyProgressBar(userProfileViewModel: userProfileViewModel, book: $book)
+                  
                 }
                 .foregroundStyle(.white)
 
-                Spacer(minLength: 0)
             }
         }
-        .padding(.leading, 50)
-        .padding(.trailing, 30)
+        .padding(.horizontal, 40)
         .fullScreenCover(isPresented: $showBookDetails, onDismiss: onDismiss) {
             BookDetailsView(userProfileViewModel: userProfileViewModel, book: $book, bookStatus: $book.bookStatus)
         }

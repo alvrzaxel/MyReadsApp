@@ -35,6 +35,7 @@ struct HomeWelcome: View {
             
             HStack {
                 Text(greeting).foregroundStyle(.colortext9) +
+//                Text("morning, ").foregroundStyle(.colortext9) +
                 Text(firstName).foregroundStyle(.colortext2)
             }
             .font(.system(size: 20, weight: .regular))

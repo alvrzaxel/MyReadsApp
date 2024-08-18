@@ -37,6 +37,7 @@ struct MyBooksPickerBooksList: View {
             UnevenRoundedRectangle(topLeadingRadius: 0, bottomLeadingRadius: 10, bottomTrailingRadius: 10, topTrailingRadius: 0, style: .continuous)
                 .fill(.colorbackground2)
         }
+        .padding(.bottom, 90)
     }
     
     /// Obtiene los libros filtrados según la lista seleccionada

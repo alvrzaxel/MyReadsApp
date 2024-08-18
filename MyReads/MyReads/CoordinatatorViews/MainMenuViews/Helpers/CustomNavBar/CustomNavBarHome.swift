@@ -25,7 +25,7 @@ struct CustomNavBarHome: View {
         }
         .frame(maxWidth: .infinity, maxHeight: 40)
         .padding(.bottom, 10)
-        .background(.colorbackground1.opacity(0.97))
+        .background(.colorbackground1.opacity(0.98))
         .overlay {
             CircleMagnifyingGlass(googleApiViewModel: googleApiViewModel)
                 .offset(y: 2)

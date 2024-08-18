@@ -16,10 +16,6 @@ final class UserProfileViewModel: ObservableObject {
     @Published var profileImage: UIImage?
     
     @Published var convertedBooks: [UserBookModel] = []
-    @Published var wantToReadBooks: [UserBookModel] = []
-    @Published var readBooks: [UserBookModel] = []
-    @Published var currentlyReadingBooks: [UserBookModel] = []
-    
     @Published var shouldDismiss: Bool = false
     
     private let userProfileRepository: UserProfileRepository
@@ -40,7 +36,7 @@ final class UserProfileViewModel: ObservableObject {
     }
     
     
-    /// Carga la información del usuario actual
+    // Carga la información del usuario actual
     func loadCurrentUser() {
         Task {
             guard let currentUser = authenticationRepository.getCurrentUser() else { return }
@@ -52,14 +48,14 @@ final class UserProfileViewModel: ObservableObject {
         }
     }
     
-    /// Obtiene los datos del usuario desde Firestore y los carga en el usuario
+    
+    // Obtiene los datos del usuario desde Firestore y los carga en el usuario
     func getUserDetails() async {
         
         do {
             let userModel = try await userProfileRepository.getUserDocument(user: user)
             self.user = userModel
             await loadProfileImage()
-            categorizeBooks(books: userModel.books)
             
         } catch {
             
@@ -67,7 +63,7 @@ final class UserProfileViewModel: ObservableObject {
                 try await userProfileRepository.createUserDocument(user: user)
                 let userModel = try await userProfileRepository.getUserDocument(user: user)
                 self.user = userModel
-                categorizeBooks(books: userModel.books)
+                await loadProfileImage()
                 
             } catch {
                 self.errorMessage = "Failed to load or create user details."
@@ -77,7 +73,7 @@ final class UserProfileViewModel: ObservableObject {
     }
     
     
-    /// Actualiza una propiedad del perfil del usuario en la base de datos y actualiza los datos del usuario
+    // Actualiza una propiedad del perfil del usuario en la base de datos y actualiza los datos del usuario
     func updateUserProfileProperty(property: UserProfileProperty) {
         Task {
             do {
@@ -91,45 +87,58 @@ final class UserProfileViewModel: ObservableObject {
     }
     
     
-    /// Carga la imagen del usuariio
+    // Carga la imagen del usuariio
     func loadProfileImage() async {
         guard let imageUrlString = user.photoURL else {
             return
         }
-        print(imageUrlString)
+        
         let highResolutionUrlString = imageUrlString.replacingOccurrences(of: "s96-c", with: "s256-c")
         
         guard let imageUrl = URL(string: highResolutionUrlString) else {
             return
         }
-        print(highResolutionUrlString)
+        
         do {
             let (data, _) = try await URLSession.shared.data(from: imageUrl)
             if let uiImage = UIImage(data: data) {
                 self.profileImage = uiImage
             }
         } catch {
+            self.errorMessage = "Failed to download profile image \(error.localizedDescription)"
+            self.showAlert = true
             print("Error al descargar la imagen: \(error)")
         }
     }
     
     
-    /// Añade un libro a su base de datos
+    // Actualiza la imagen de perfil
+    func updateProfileImage(imageData: Data) async {
+        do {
+            try await userProfileRepository.uploadProfileImage(user: user, imageData: imageData)
+            await loadProfileImage()  // Recargar la imagen para reflejar los cambios
+            await getUserDetails()
+        } catch {
+            self.errorMessage = "Failed to update profile image \(error.localizedDescription)"
+            self.showAlert = true
+            print("Error al actualizar la imagen de perfil: \(error)")
+        }
+    }
+    
+    
+    // Añade o actualiza un libro en la lista del usuario y actualiza la base de datos
     func addBook(userBook: UserBookModel, status: BookStatus) {
         Task {
-            var currentUser = user
-            
-            if let index = currentUser.books.firstIndex(where: { $0.id == userBook.id }) {
-                currentUser.books[index].bookStatus = status
+            if let index = self.user.books.firstIndex(where: { $0.id == userBook.id }) {
+                self.user.books[index].bookStatus = status
             } else {
-                currentUser.books.append(userBook)
+                var bookWithStatus = userBook
+                bookWithStatus.bookStatus = status
+                self.user.books.append(bookWithStatus)
             }
             
             do {
-                try await userProfileRepository.updateUserBooks(user: currentUser)
-                self.user = currentUser
-                
-                categorizeBooks(books: currentUser.books)
+                try await userProfileRepository.updateUserBooks(user: self.user)
             } catch {
                 self.errorMessage = "Failed to update user books: \(error.localizedDescription)"
                 self.showAlert = true
@@ -137,25 +146,21 @@ final class UserProfileViewModel: ObservableObject {
         }
     }
     
-    /// Elimina un libro de su base de datos
+    
+    // Elimina un libro de la lista del usuario y actualiza la base de datos
     func removeBook(bookID: String) {
         Task {
-            var currentUser = user
             
-            guard let index = currentUser.books.firstIndex(where: { $0.id == bookID}) else {
+            guard let index = self.user.books.firstIndex(where: { $0.id == bookID }) else {
                 self.errorMessage = "Book not found in user's collection."
                 self.showAlert = true
                 return
             }
             
-            currentUser.books.remove(at: index)
+            self.user.books.remove(at: index)
             
             do {
-                try await userProfileRepository.updateUserBooks(user: currentUser)
-                self.user = currentUser
-                
-                categorizeBooks(books: currentUser.books)
-                
+                try await userProfileRepository.updateUserBooks(user: self.user)
             } catch {
                 self.errorMessage = "Failed to remove book \(error.localizedDescription)"
                 self.showAlert = true
@@ -163,85 +168,59 @@ final class UserProfileViewModel: ObservableObject {
         }
     }
     
-    /// Método para comprobar el estado de un libro
+    
+    // Obtiene el estado de un libro específico en la lista del usuario
     func getBookStatus(for googleBook: UserBookModel) -> BookStatus {
-        // Buscar en los libros que el usuario quiere leer
-        if let book = wantToReadBooks.first(where: { $0.id == googleBook.id }) {
+        if let book = user.books.first(where: { $0.id == googleBook.id }) {
             return book.bookStatus
         }
-        
-        // Buscar en los libros que el usuario ha leído
-        if let book = readBooks.first(where: { $0.id == googleBook.id }) {
-            return book.bookStatus
-        }
-        
-        // Buscar en los libros que el usuario está leyendo actualmente
-        if let book = currentlyReadingBooks.first(where: { $0.id == googleBook.id }) {
-            return book.bookStatus
-        }
-        
-        // Si el libro no se encuentra, devolver .unkenow
         return .unkenow
     }
     
-    /// Método para buscar libros por consulta y actualizar convertedBooks
-        func searchBooks(query: String) async {
-            do {
-                // Llamar al método de búsqueda en GoogleApiViewModel
-                let userBooks = try await googleApiViewRepository.searchBooks(query: query)
-                // Actualizar convertedBooks con los resultados convertidos
-                self.convertedBooks = userBooks
-            } catch {
-                self.errorMessage = "Error al buscar libros: \(error.localizedDescription)"
-                self.showAlert = true
+    // Determina si se debe mostrar CurrentlyReadingView
+    func shouldShowCurrentlyReadingView() -> Bool {
+        return user.books.contains(where: { $0.bookStatus == .currentlyReading })
+    }
+    
+    // Determina si se debe mostrar WantToRead
+    func shouldShowWantToRead() -> Bool {
+        return user.books.contains(where: { $0.bookStatus == .wantToRead })
+    }
+    
+    // Determina si se debe mostrar Read
+    func shouldShowRead() -> Bool {
+        return user.books.contains(where: { $0.bookStatus == .read })
+    }
+    
+    // Actualiza el progreso de páginas leidas de un libro
+    func updateReadingProgress(for book: UserBookModel, pagesRead: Int) {
+        if let index = user.self.books.firstIndex(where: { $0.id == book.id }) {
+            user.books[index].pagesRead = pagesRead
+            
+            Task {
+                do {
+                    try await userProfileRepository.updateUserBooks(user: self.user)
+                } catch {
+                    self.errorMessage = "Failed to update Reading progress \(error.localizedDescription)"
+                    self.showAlert = true
+                }
             }
         }
+    }
     
-    /// Convierte un array de GoogleBookModel a un array de UserBookModel
-    func convertBooksArray(from googleBooks: [GoogleBookModel], with status: BookStatus) -> [UserBookModel] {
-        return googleBooks.map { googleBook in
-            convertToUserBookModel(from: googleBook, with: status)
+    // Busca libros y actualiza la lista de libros convertidos
+    func searchBooks(query: String) async {
+        do {
+            let userBooks = try await googleApiViewRepository.searchBooks(query: query)
+            self.convertedBooks = userBooks
+        } catch {
+            self.errorMessage = "Error al buscar libros: \(error.localizedDescription)"
+            self.showAlert = true
         }
     }
     
     
-    /// Convierte GoogleBookModel a UserBookModel
-    private func convertToUserBookModel(from googleBook: GoogleBookModel, with status: BookStatus) -> UserBookModel {
-        return UserBookModel(
-            id: googleBook.id,
-            title: googleBook.volumeInfo.title,
-            authors: googleBook.volumeInfo.authors,
-            publishedDate: googleBook.volumeInfo.publishedDate,
-            description: googleBook.volumeInfo.description,
-            pagesRead: 0,
-            pageCount: googleBook.volumeInfo.pageCount,
-            categories: googleBook.volumeInfo.categories,
-            averageRating: googleBook.volumeInfo.averageRating,
-            myRating: 0.0, 
-            language: googleBook.volumeInfo.language,
-            imageLinks: googleBook.volumeInfo.imageLinks,
-            bookStatus: status,
-            creationDate: Date()
-        )
-    }
-    
-    
-    /// Categoriza los libros en diferentes listas
-    private func categorizeBooks(books: [UserBookModel]) {
-        self.wantToReadBooks = books
-            .filter { $0.bookStatus == .wantToRead }
-            .sorted { $0.creationDate > $1.creationDate }
-        
-        self.readBooks = books
-            .filter { $0.bookStatus == .read }
-            .sorted { $0.creationDate > $1.creationDate }
-        
-        self.currentlyReadingBooks = books
-            .filter { $0.bookStatus == .currentlyReading }
-            .sorted { $0.creationDate > $1.creationDate }
-    }
-    
-    /// Elimina el perfil del usuario
+    // Elimina el perfil del usuario
     func deleteUserProfile() {
         Task {
             
@@ -259,7 +238,7 @@ final class UserProfileViewModel: ObservableObject {
     }
     
     
-    /// Actualiza la contraseña del usuario
+    // Actualiza la contraseña del usuario
     func updatePassword(newPassword: String) {
         Task {
             
@@ -276,7 +255,7 @@ final class UserProfileViewModel: ObservableObject {
     }
     
     
-    /// Cierra la sesión del usuario
+    // Cierra la sesión del usuario
     func signOut() {
         Task {
             do {
@@ -288,7 +267,5 @@ final class UserProfileViewModel: ObservableObject {
             }
         }
     }
-    
-    
     
 }

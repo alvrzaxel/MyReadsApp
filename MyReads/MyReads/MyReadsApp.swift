@@ -26,25 +26,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct MyReadsApp: App {
     // Vincula el AppDelegate con SwiftUI
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
-    @AppStorage("appearanceMode") private var appearanceMode: String = AppearenceMode2.system.rawValue
+    @Environment(\.colorScheme) private var scheme
+    @AppStorage("userTheme") private var userTheme: Theme = .systemDefault
     
     var body: some Scene {
         WindowGroup {
             CoordinatorView()
-                .preferredColorScheme(currentColorScheme)
-            
+                .preferredColorScheme(userTheme.colorScheme)
         }
     }
     
-    var currentColorScheme: ColorScheme? {
-            switch AppearenceMode2(rawValue: appearanceMode) ?? .system {
-            case .light:
-                return .light
-            case .dark:
-                return .dark
-            case .system:
-                return nil
-            }
-        }
+
 }

@@ -13,7 +13,7 @@ class GoogleApiDatasoruce {
     
     private let baseURL = "https://www.googleapis.com/books/v1/volumes"
     
-    /// Búsqueda genérica de libros
+    // Búsqueda genérica de libros
     func fetchBooks(query: String) async throws -> [UserBookModel] {
         let escapedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "\(baseURL)?q=\(escapedQuery)&key=\(Config.googleApiKey)"
@@ -29,11 +29,10 @@ class GoogleApiDatasoruce {
         let booksResponse = try JSONDecoder().decode(GoogleBooksResponseModel.self, from: data)
         let googleBooks = booksResponse.items
         
-        // Convertir a UserBookModel usando el método intermedio
         return convertBooksArray(from: googleBooks, with: .unkenow)
     }
     
-    /// Búsqueda por categoría
+    // Búsqueda por categoría
     func fetchBooks(byCategory category: String) async throws -> [UserBookModel] {
         let escapedCategory = category.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "\(baseURL)?q=subject:\(escapedCategory)&orderBy=newest&key=\(Config.googleApiKey)"
@@ -50,11 +49,10 @@ class GoogleApiDatasoruce {
         let booksResponse = try JSONDecoder().decode(GoogleBooksResponseModel.self, from: data)
         let googleBooks = booksResponse.items
         
-        // Convertir a UserBookModel usando el método intermedio
         return convertBooksArray(from: googleBooks, with: .unkenow)
     }
     
-    /// Búsqueda por autor
+    // Búsqueda por autor
     func fetchBooks(byAuthor author: String) async throws -> [UserBookModel] {
         let escapedAuthor = author.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "\(baseURL)?q=inauthor:\(escapedAuthor)&key=\(Config.googleApiKey)"
@@ -71,12 +69,11 @@ class GoogleApiDatasoruce {
         let booksResponse = try JSONDecoder().decode(GoogleBooksResponseModel.self, from: data)
         let googleBooks = booksResponse.items
         
-        // Convertir a UserBookModel usando el método intermedio
         return convertBooksArray(from: googleBooks, with: .unkenow)
     }
     
     
-    /// Búsqueda por ID
+    // Búsqueda por ID
     func fetchBook(byId id: String) async throws -> UserBookModel? {
         let urlString = "\(baseURL)/\(id)?key=\(Config.googleApiKey)"
         guard let url = URL(string: urlString) else {
@@ -90,19 +87,18 @@ class GoogleApiDatasoruce {
         
         let bookResponse = try JSONDecoder().decode(GoogleBookModel.self, from: data)
         
-        // Convertir a UserBookModel usando el método intermedio
         return convertToUserBookModel(from: bookResponse, with: .unkenow)
     }
     
     
-    /// Método privado para convertir un array de GoogleBookModel a un array de UserBookModel
+    // Convierte un array de GoogleBookModel a un array de UserBookModel
     private func convertBooksArray(from googleBooks: [GoogleBookModel], with status: BookStatus) -> [UserBookModel] {
         return googleBooks.map { googleBook in
             convertToUserBookModel(from: googleBook, with: status)
         }
     }
     
-    /// Método privado para convertir GoogleBookModel a UserBookModel
+    // Convierte GoogleBookModel a UserBookModel
     private func convertToUserBookModel(from googleBook: GoogleBookModel, with status: BookStatus) -> UserBookModel {
         return UserBookModel(
             id: googleBook.id,

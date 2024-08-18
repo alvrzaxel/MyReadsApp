@@ -18,11 +18,11 @@ struct UserSettingsImageProfile: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            
             VStack {
                 if let profileImage = userProfileViewModel.profileImage {
                     UserImageSettingsView(profileImage: profileImage)
                         .frame(width: 120, height: 120)
+                        
                 } else {
                     UserEmptyImageSettingsView()
                         .frame(width: 120, height: 120)
@@ -43,44 +43,58 @@ struct UserSettingsImageProfile: View {
                 .foregroundStyle(.colorAccentOrange)
             }
             .photosPicker(isPresented: $showPicker, selection: $selectedItem, matching: .images)
+            .onChange(of: selectedItem) {
+                Task {
+                    await loadAndUploadImage()
+                }
+            }
             
             Text(userProfileViewModel.user.displayName)
-                .font(.system(size: 24, weight: .semibold))
+                .font(.system(size: 22, weight: .regular))
             
-            
-            List {
-                Section(header: Text("User Name")) {
-                    TextField(text: $newDisplayName) {
-                        Text(userProfileViewModel.user.displayName)
-                    }
-                    .onSubmit {
-                        userProfileViewModel.updateUserProfileProperty(property: .displayName(newDisplayName))
-                    }
-                }
-                
-//                Section(header: Text("Email")) {
-//                    TextField(text: $displayName) {
-//                        Text(userProfileViewModel.user.email)
-//                    }
-//                }
-                
-                Section(header: Text("Goal books read by 2024")) {
-                    TextField(text: $newBooksGoal) {
-                        Text(String(userProfileViewModel.user.yearlyReadingGoal))
-                    }
-                    .onSubmit {
-                        userProfileViewModel.updateUserProfileProperty(property: .yearlyReadingGoal(Int(newBooksGoal) ?? 1))
-                    }
-                }
-            }.foregroundStyle(.primary)
-            .listStyle(.plain)
-            .padding(.horizontal)
-            Spacer()
         }
-        .padding(.top)
     }
+    
+    private func loadAndUploadImage() async {
+            guard let selectedItem = selectedItem else { return }
+            
+            do {
+                let data = try await selectedItem.loadTransferable(type: Data.self)
+                guard let imageData = data else { return }
+                await userProfileViewModel.updateProfileImage(imageData: imageData)
+                
+            } catch {
+                print("Failed to load or upload image: \(error.localizedDescription)")
+            }
+        }
 }
 
 #Preview {
     UserSettingsImageProfile(userProfileViewModel: UserProfileViewModel())
+}
+
+
+
+struct UserImageSettingsView: View {
+    var profileImage: UIImage
+    
+    var body: some View {
+        Image(uiImage: profileImage)
+            .resizable()
+            .scaledToFill()
+            .clipShape(Circle()) // Recorta la imagen en forma de círculo
+            .overlay(
+                Circle().stroke(Color.white, lineWidth: 2) // Agrega un borde blanco alrededor del círculo
+            )
+        
+    }
+}
+
+struct UserEmptyImageSettingsView: View {
+    var body: some View {
+        Image(systemName: "person.circle.fill")
+            .resizable()
+            .foregroundStyle(.gray)
+        
+    }
 }

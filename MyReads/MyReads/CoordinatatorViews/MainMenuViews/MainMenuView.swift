@@ -31,17 +31,14 @@ struct MainMenuView: View {
                 case .person:
                     UserProfileView(userProfileViewModel: userProfileViewModel, showChangeTheme: $showChangeTheme)
                         .preferredColorScheme(userTheme.colorScheme)
-                        
                 }
-
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .animation(nil, value: selectedView)
             .transition(.identity)
             .overlay(alignment: .bottom) {
                 CustomTabBarView(selectedTab: $selectedView)
-                    .padding(.bottom, 20).background(.colorbackground1.opacity(0.98))
-                    
             }
         }
         .sheet(isPresented: $showChangeTheme, content: {
@@ -55,6 +52,7 @@ struct MainMenuView: View {
 
 #Preview {
     MainMenuView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
+        
 }
 
 

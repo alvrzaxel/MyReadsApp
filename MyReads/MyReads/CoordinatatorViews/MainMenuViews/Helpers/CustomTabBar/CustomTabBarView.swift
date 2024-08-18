@@ -29,11 +29,15 @@ struct CustomTabBarView: View {
     @Binding var selectedTab: TabIcon
     @State var Xoffset = 0.0
     var body: some View {
-        Spacer()
-        HStack {
-            ForEach(tabItems) { item in
-                Spacer()
-                VStack {
+        VStack {
+            Rectangle()
+                .fill(.colortext1).opacity(0.05)
+                .frame(maxWidth: .infinity)
+                .frame(height: 1)
+            
+            HStack {
+                ForEach(tabItems) { item in
+                    Spacer()
                     Image(systemName: item.iconname)
                         .resizable()
                         .scaledToFit()
@@ -47,22 +51,26 @@ struct CustomTabBarView: View {
                             
                         }
                     Spacer(minLength: 0)
+                    
                 }
-                .frame(height: 40)
-                .padding(.top, 3)
-                Spacer()
-  
+                .frame(width: 46.6)
             }
-            .frame(width: 46.6)
+            .padding(.top, 2)
+            Spacer(minLength: 0)
         }
-        .frame(height: 60)
-        
+        .frame(height: 78)
         .overlay(alignment: .bottomLeading) {
             Circle().frame(width: 6, height: 6).foregroundStyle(.customOrange7)
-                .offset(x: 66.5, y: -16)
+                .offset(x: 66.5, y: -28)
                 .offset(x: Xoffset)
         }
+        .background(.colorbackground1.opacity(0.98))
+        
+        
+        
+        
     }
+    
 }
 
 #Preview {

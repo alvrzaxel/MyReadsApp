@@ -45,6 +45,9 @@ struct MyBooksPickerView: View {
             .scrollIndicators(.never)
         }
         .padding(.horizontal, 20)
+        
+        
+        
     }
     
 }

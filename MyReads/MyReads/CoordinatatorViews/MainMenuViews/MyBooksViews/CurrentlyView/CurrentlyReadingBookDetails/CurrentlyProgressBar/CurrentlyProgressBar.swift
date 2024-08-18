@@ -13,7 +13,7 @@ struct CurrentlyProgressBar: View {
     @State var showUpdateProgress: Bool = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center ,spacing: 15) {
                 Text("Progress").font(.system(size: 14)).foregroundStyle(.white)
                 
@@ -48,7 +48,6 @@ struct CurrentlyProgressBar: View {
                         }
                 })
             }
-            
             
         }
         .sheet(isPresented: $showUpdateProgress) {

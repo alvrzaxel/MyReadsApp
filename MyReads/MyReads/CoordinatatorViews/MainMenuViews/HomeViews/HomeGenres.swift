@@ -36,7 +36,7 @@ struct HomeGenres: View {
             
             ScrollView(.vertical) {
                 if !googleApiViewModel.booksByCategory.isEmpty {
-                    VStack(spacing: 22) {
+                    VStack(spacing: 24) {
                         ForEach(googleApiViewModel.booksByCategory) { book in
                             BookInList(
                                 userProfileViewModel: userProfileViewModel, book: book)

@@ -12,14 +12,17 @@ import FirebaseAuth
 import GoogleSignIn
 import GoogleSignInSwift
 
+// Maneja errores específicos de Google Sign-In
 enum GoogleSignInError: Error {
     case missingClientID
     case noRootViewController
     case missingIDToken
 }
 
+// Gestiona la autenticación con Google
 final class GoogleAuthentication {
     
+    // Inicia sesión con Google de manera asíncrona
     @MainActor
     func signInWithGoogle() async throws -> AuthCredential {
         

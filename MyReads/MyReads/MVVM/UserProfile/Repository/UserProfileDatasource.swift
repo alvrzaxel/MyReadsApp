@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import FirebaseFirestoreSwift
+import FirebaseStorage
 
 enum UserProfileProperty {
     case displayName(String)
@@ -76,12 +77,13 @@ final class UserProfileDatasource {
         let email = data["email"] as? String ?? "No email"
         let emailVerified = data["emailVerified"] as? Bool ?? false
         let photoURL = data["photoURL"] as? String
-        let providerID = data["providerID"] as? String ?? "No Provider"
+        let providerIDString = data["providerID"] as? String ?? "No Provider"
         let creationDateTimestamp = data["creationDate"] as? Timestamp
         let creationDate = creationDateTimestamp?.dateValue() ?? Date()
         let yearlyReadingGoal = data["yearlyReadingGoal"] as? Int ?? 1
         
         let books: [UserBookModel] = try await getUserBooks(user: user)
+        let providerID = ProviderID(rawValue: providerIDString)
         
         // Crea y devuelve un UserModel
         let userModel = UserModel(
@@ -135,6 +137,7 @@ final class UserProfileDatasource {
             dataToUpdate["photoURL"] = newPhotoURl
         case .yearlyReadingGoal(let newGoal):
             dataToUpdate["yearlyReadingGoal"] = newGoal
+            print("Se actualiza goal")
         }
         
         try await userRef.updateData(dataToUpdate)
@@ -157,6 +160,29 @@ final class UserProfileDatasource {
     // Elimina el documento del usuario basado en su UID
     func deleteUserDocument(user: UserModel) async throws {
         try await db.collection(usersCollection).document(user.uid).delete()
+    }
+    
+    // Subir una imagen de perfil a Firebase Storage y actualizar la URL en Firestore
+    func uploadProfileImage(user: UserModel, imageData: Data) async throws {
+        // Referencia al almacenamiento de Firebase
+        let storageRef = Storage.storage().reference()
+        // Crea una referencia para la imagen con el UID del usuario
+        let imageRef = storageRef.child("profile_images/\(user.uid).jpg")
+        
+        // Subir la imagen a Firebase Storage
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        
+        do {
+            _ = try await imageRef.putDataAsync(imageData, metadata: metadata)
+            // Obtener la URL de descarga de la imagen subida
+            let downloadURL = try await imageRef.downloadURL()
+            // Actualizar la URL de la imagen en Firestore
+            try await updateUserProfileProperty(user: user, property: .photoURL(downloadURL.absoluteString))
+        } catch {
+            print("Error to upload profile image: \(error)")
+            throw error
+        }
     }
     
 }

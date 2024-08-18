@@ -23,7 +23,7 @@ struct CustomNavBarMyBooks: View {
         }
         .frame(maxWidth: .infinity, maxHeight: 40)
         .padding(.bottom, 10)
-        .background(.colorbackground1.opacity(0.95))
+        .background(.colorbackground1.opacity(0.98))
         
         
     }

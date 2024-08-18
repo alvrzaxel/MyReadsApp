@@ -17,11 +17,11 @@ struct CurrentlyBackground: View {
                 AsyncImageView(urlString: imageUrl)
                     .scaledToFill()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .frame(width: 350, height: 150)
-                    .blur(radius: 20)
+                    .frame(width: 350, height: 120)
+                    .blur(radius: 10)
                     .clipShape(.rect(cornerRadius: 6))
                     //.clipped()
-                    .blur(radius: 5)
+                    .blur(radius: 2)
                     
             } else {
                 Rectangle()
@@ -31,8 +31,8 @@ struct CurrentlyBackground: View {
                     .blur(radius: 20)
             }
         }
-        .padding(.vertical, 10)
-        .frame(width: 400)
+        .padding(.vertical, 2)
+        .opacity(0.95)
  
     }
 }

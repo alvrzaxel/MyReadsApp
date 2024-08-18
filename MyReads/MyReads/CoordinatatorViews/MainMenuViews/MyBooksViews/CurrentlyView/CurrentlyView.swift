@@ -38,25 +38,6 @@ struct CurrentlyView: View {
         currentlyReadsBooks = userProfileViewModel.user.books.filter { $0.bookStatus == .currentlyReading }
     }
 }
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
 
 
 
@@ -75,7 +56,7 @@ struct CurrentlyView: View {
 
 
 
-  
+
 
 
 

@@ -85,10 +85,6 @@ final class AuthenticationViewModel: ObservableObject {
                     self.user = googleUser
                 }
                 
-               
-                
-                // Actualiza el perfil del usuario, si es necesario
-                
             } catch {
                 self.messageError = error.localizedDescription
                 self.showAlert = true
