@@ -38,15 +38,15 @@ struct UserSettingsAccount: View {
                     
                 }
                 
-                Section() {
-                    VStack {
-                        UserSettingsProvider(UserProviderID: userProfileViewModel.user.providerID)
-                    }
-                    Button("Sign out") {
-                        authenticationViewModel.logout()
-                        
-                    }.foregroundStyle(.red)
-                }
+//                Section() {
+//                    VStack {
+//                        UserSettingsProvider(UserProviderID: userProfileViewModel.user.providerID)
+//                    }
+//                    Button("Sign out") {
+//                        authenticationViewModel.logout()
+//                        
+//                    }.foregroundStyle(.red)
+//                }
                 
                 Section(header: Text("Settings Account")) {
                     Button("Delete account") {

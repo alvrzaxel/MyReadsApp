@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct MainMenuView: View {
+    @AppStorage("userTheme") private var userTheme: Theme = .systemDefault
+    @Environment(\.colorScheme) private var scheme
+    @State private var showChangeTheme: Bool = false
+    
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
-    @StateObject private var keyboardManager = KeyboardManager()
     @State var selectedView: TabIcon = .home
     
     var body: some View {
@@ -20,11 +23,14 @@ struct MainMenuView: View {
             VStack {
                 switch selectedView {
                 case .home:
-                    HomeView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
+                    HomeView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel, showChangeTheme: $showChangeTheme)
+                        .preferredColorScheme(userTheme.colorScheme)
                 case .book:
-                    MyBooksView()
+                    MyBooksView(showChangeTheme: $showChangeTheme, userProfileViewModel: userProfileViewModel)
+                        .preferredColorScheme(userTheme.colorScheme)
                 case .person:
-                    UserProfileView(userProfileViewModel: userProfileViewModel)
+                    UserProfileView(userProfileViewModel: userProfileViewModel, showChangeTheme: $showChangeTheme)
+                        .preferredColorScheme(userTheme.colorScheme)
                         
                 }
 
@@ -33,11 +39,16 @@ struct MainMenuView: View {
             .animation(nil, value: selectedView)
             .transition(.identity)
             .overlay(alignment: .bottom) {
-                CustomNav(selectedTab: $selectedView)
-                    .padding(.bottom, 20).background(.backgroundGeneral.opacity(0.90))
+                CustomTabBarView(selectedTab: $selectedView)
+                    .padding(.bottom, 20).background(.colorbackground1.opacity(0.98))
                     
             }
         }
+        .sheet(isPresented: $showChangeTheme, content: {
+            ThemeChangeView(scheme: scheme)
+                .presentationDetents([.height(410)])
+                .presentationBackground(.clear)
+        })
         .ignoresSafeArea(edges: .bottom)
     }
 }
@@ -45,3 +56,6 @@ struct MainMenuView: View {
 #Preview {
     MainMenuView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
 }
+
+
+

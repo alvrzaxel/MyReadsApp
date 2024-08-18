@@ -10,60 +10,39 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @ObservedObject var googleApiViewModel: GoogleApiViewModel
+    @Binding  var showChangeTheme: Bool
     
     var body: some View {
         ZStack {
-            Color.backgroundGeneral.ignoresSafeArea()
+            Color.colorbackground1.ignoresSafeArea()
             
-            VStack {
+            VStack(spacing: 50) {
                 if googleApiViewModel.booksResultSearch != nil {
                     SearchResultsView(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
                     
                 } else {
-                    
                     HomeWelcome(name: userProfileViewModel.user.displayName)
                     HomeGenres(userProfileViewModel: userProfileViewModel, googleApiViewModel: googleApiViewModel)
                 }
             }
         }
         .safeAreaInset(edge: .top, content: {
-            NavBarHome(googleApiViewModel: googleApiViewModel)
+            CustomNavBarHome(googleApiViewModel: googleApiViewModel, showChangeTheme: $showChangeTheme)
         })
     }
 }
 
-struct NavBarHome: View {
-    @ObservedObject var googleApiViewModel: GoogleApiViewModel
-    
-    var body: some View {
-        VStack {
-            Image(.iconBar)
-                .resizable()
-                .scaledToFit()
-                .frame(height: 30)
-                
-        }
-        .frame(maxWidth: .infinity, maxHeight: 50)
-        .padding(.bottom, 10)
-        .background(.backgroundGeneral.opacity(0.95))
-        .overlay {
-            CircleMagnifyingGlass(googleApiViewModel: googleApiViewModel)
-                .offset(y: 2)
-        }
-        
-    }
-}
 
 
 #Preview("Ligth") {
     NavigationStack {
-        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
+        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel(), showChangeTheme: .constant(false))
     }
 }
 
 #Preview("Dark") {
     NavigationStack {
-        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel())
+        HomeView(userProfileViewModel: UserProfileViewModel(), googleApiViewModel: GoogleApiViewModel(), showChangeTheme: .constant(false))
     }
     .preferredColorScheme(.dark)
 }

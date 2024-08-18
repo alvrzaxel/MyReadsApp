@@ -11,29 +11,30 @@ struct UserProfileView: View {
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @EnvironmentObject var authenticationViewModel: AuthenticationViewModel
     @State var showSettings: Bool = false
+    @Binding  var showChangeTheme: Bool
+    
     var body: some View {
         ZStack() {
-            Color.backgroundGeneral.ignoresSafeArea()
+            Color.colorbackground1.ignoresSafeArea()
             VStack {
                 UserDetailsView(userProfileViewModel: userProfileViewModel)
                   
                 Spacer()
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+
             }
             .padding(.horizontal)
+            .padding(.top, 10)
  
+            
+            
+            
+            
+            
+            
+            
         }
         .safeAreaInset(edge: .top) {
-            NavBarUserProfile(showSettings: $showSettings)
+            CustomNavBarUserProfile(showSettings: $showSettings, showChangeTheme: $showChangeTheme)
         }
 
         .fullScreenCover(isPresented: $showSettings,
@@ -43,53 +44,10 @@ struct UserProfileView: View {
         })
         
         
-        
     }
         
 }
 
-
-
-struct NavBarUserProfile: View {
-    @Binding var showSettings: Bool
-    
-    var body: some View {
-        VStack {
-            Image(.iconBar)
-                .resizable()
-                .scaledToFit()
-                .frame(height: 30)
-                
-        }
-        .frame(maxWidth: .infinity, maxHeight: 50)
-        .padding(.bottom, 10)
-        .background(.backgroundGeneral.opacity(0.95))
-        .overlay(alignment: .trailing) {
-            Button(action: {
-                withAnimation {
-                    showSettings.toggle()
-                }
-            }, label: {
-                Image(systemName: "gearshape")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: 20)
-                    .foregroundStyle(.customOrange5)
-            })
-            .offset(x: -30, y: -10)
-        }
-        
-    }
-        
-}
-
-
-
-
-
-//#Preview {
-//    UserProfileView(userProfileViewModel: UserProfileViewModel())
-//}
 
 
 #Preview {
@@ -109,7 +67,7 @@ struct NavBarUserProfile: View {
     viewModel.user = exampleUser
     
     return NavigationStack {
-        UserProfileView(userProfileViewModel: viewModel)
+        UserProfileView(userProfileViewModel: viewModel, showChangeTheme: .constant(false))
     }
     .environmentObject(AuthenticationViewModel())
 }

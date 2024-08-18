@@ -12,7 +12,6 @@ struct UserProfileSettingsView3: View {
     @EnvironmentObject var authenticationViewModel: AuthenticationViewModel
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     @Environment(\.dismiss) var dismiss
-    @State var showAppearence: Bool = false
     
     var body: some View {
         VStack {
@@ -59,19 +58,6 @@ struct UserProfileSettingsView3: View {
                         
                     }
                     
-                    Section() {
-                        Button(action: {
-                            withAnimation {
-                                showAppearence.toggle()
-                            }
-                            
-                        }) {
-                            Label(
-                                title: { Text("Appearence").foregroundStyle(.textNegroBlanco) },
-                                icon: { Image(systemName: "moon.fill") }
-                            )
-                        }
-                    }
                     
                 }
                 .navigationTitle("Settings")
@@ -91,11 +77,6 @@ struct UserProfileSettingsView3: View {
             }
             
         }
-        .sheet(isPresented: $showAppearence, content: {
-            UserSettingsAppearance()
-                .presentationDetents([.fraction(0.40)])
-            
-        })
         
         
     }
